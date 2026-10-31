@@ -84,7 +84,16 @@
                             </group>
                         </page>
                         <page string="Invoices">
-                            <field name="invoice_ids"/>
+                            <field name="invoice_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="invoice_date"/>
+                                    <field name="billing_period_start"/>
+                                    <field name="billing_period_end"/>
+                                    <field name="amount_total"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Internal Notes">
                             <field name="note"/>

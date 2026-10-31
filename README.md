@@ -86,6 +86,24 @@ The conversion fields are `subscription_start_date`,
 blocked for rejected, draft, sent, or expired quotations, and the unique
 `subscription.quotation_id` constraint plus a savepoint prevents duplicate
 conversions. Repeated conversion returns the existing subscription form action.
+
+## Recurring billing contract
+
+`subscription.subscription.cron_generate_recurring_invoices()` processes
+active subscriptions whose `next_invoice_date` is due. It creates native
+`account.move` customer invoices in draft state, with native invoice lines,
+taxes, discounts, payment terms, and currency. Each invoice stores
+`subscription_id`, `billing_period_start`, and `billing_period_end`, and the
+subscription's next date advances only after successful creation.
+
+The scheduled action `ir_cron_generate_recurring_invoices` runs daily in
+batches of 100. Paused, closed, and expired subscriptions are excluded.
+Calendar-aware plan billing dates determine each covered period. A database
+unique constraint on `(subscription_id, billing_period_start,
+billing_period_end)`, plus row locking with `SKIP LOCKED`, prevents duplicate
+invoices when jobs overlap or retry. A failure is rolled back to its savepoint,
+logged with the subscription number and ID, and does not stop other
+subscriptions in the batch.
 > **Brightloop Enterprise Billing & Subscription Management Platform**
 
 A production-grade, enterprise SaaS architecture designed for high-precision subscription lifecycle management, recurring revenue telemetry (MRR/ARR), plan tiering, and billing automation.

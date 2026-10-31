@@ -1,7 +1,12 @@
 from datetime import timedelta
+import logging
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
+from psycopg2 import IntegrityError
+
+
+_logger = logging.getLogger(__name__)
 
 
 class Subscription(models.Model):
@@ -382,6 +387,142 @@ class Subscription(models.Model):
     def cron_close_expired_subscriptions(self):
         return self._close_expired_subscriptions()
 
+    def _get_billing_period(self):
+        self.ensure_one()
+        period_start = self.next_invoice_date
+        period_end = min(
+            self.plan_id.get_next_billing_date(period_start) - timedelta(days=1),
+            self.expiry_date,
+        )
+        return period_start, period_end
+
+    def _prepare_recurring_invoice_values(self, period_start, period_end):
+        self.ensure_one()
+        invoice_lines = []
+        for line in self.line_ids:
+            income_account = line.product_id.with_company(
+                self.env.company
+            )._get_product_accounts().get('income')
+            if not income_account:
+                raise UserError(
+                    _("Product '%s' has no income account.") % line.product_id.display_name
+                )
+            invoice_lines.append((0, 0, {
+                'name': line.product_id.display_name,
+                'product_id': line.product_id.id,
+                'account_id': income_account.id,
+                'quantity': line.quantity,
+                'price_unit': line.unit_price,
+                'discount': line.discount,
+                'tax_ids': [(6, 0, line.tax_ids.ids)],
+            }))
+        return {
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_id.id,
+            'currency_id': self.currency_id.id,
+            'invoice_date': period_start,
+            'invoice_payment_term_id': self.payment_term_id.id,
+            'invoice_origin': self.subscription_number,
+            'ref': _(
+                '%(subscription)s (%(start)s - %(end)s)',
+                subscription=self.subscription_number,
+                start=period_start,
+                end=period_end,
+            ),
+            'subscription_id': self.id,
+            'billing_period_start': period_start,
+            'billing_period_end': period_end,
+            'invoice_line_ids': invoice_lines,
+        }
+
+    def _create_recurring_invoice(self):
+        self.ensure_one()
+        today = fields.Date.context_today(self)
+        if (
+            self.state != 'active'
+            or self.expiry_date < today
+            or self.next_invoice_date > today
+        ):
+            return self.env['account.move']
+        period_start, period_end = self._get_billing_period()
+        Move = self.env['account.move']
+        existing = Move.search([
+            ('subscription_id', '=', self.id),
+            ('billing_period_start', '=', period_start),
+            ('billing_period_end', '=', period_end),
+        ], limit=1)
+        if existing:
+            return existing
+        try:
+            with self.env.cr.savepoint():
+                invoice = Move.create(
+                    self._prepare_recurring_invoice_values(period_start, period_end)
+                )
+                next_invoice_date = self.plan_id.get_next_billing_date(period_start)
+                if next_invoice_date > self.expiry_date:
+                    next_invoice_date = self.expiry_date
+                self.write({'next_invoice_date': next_invoice_date})
+        except IntegrityError:
+            invoice = Move.search([
+                ('subscription_id', '=', self.id),
+                ('billing_period_start', '=', period_start),
+                ('billing_period_end', '=', period_end),
+            ], limit=1)
+            if not invoice:
+                raise
+        return invoice
+
+    @api.model
+    def cron_generate_recurring_invoices(self, limit=100):
+        today = fields.Date.context_today(self)
+        candidates = self.search([
+            ('state', '=', 'active'),
+            ('next_invoice_date', '<=', today),
+            ('expiry_date', '>=', today),
+        ], limit=limit, order='next_invoice_date, id')
+        if not candidates:
+            return {'processed': 0, 'invoices': 0, 'failures': 0}
+        self.env.cr.execute(
+            """
+                SELECT id
+                  FROM subscription_subscription
+                 WHERE id = ANY(%s)
+                   AND state = 'active'
+                   AND next_invoice_date <= %s
+                   AND expiry_date >= %s
+                 FOR UPDATE SKIP LOCKED
+            """,
+            [candidates.ids, today, today],
+        )
+        locked = self.browse(row[0] for row in self.env.cr.fetchall())
+        invoices = self.env['account.move']
+        failures = 0
+        for subscription in locked:
+            try:
+                with self.env.cr.savepoint():
+                    while (
+                        subscription.state == 'active'
+                        and subscription.next_invoice_date <= today
+                        and subscription.next_invoice_date <= subscription.expiry_date
+                    ):
+                        previous_date = subscription.next_invoice_date
+                        invoice = subscription._create_recurring_invoice()
+                        invoices |= invoice
+                        if subscription.next_invoice_date == previous_date:
+                            break
+            except Exception:
+                failures += 1
+                _logger.exception(
+                    "Recurring billing failed for subscription %s (id=%s)",
+                    subscription.subscription_number,
+                    subscription.id,
+                )
+        return {
+            'processed': len(locked),
+            'invoices': len(invoices),
+            'failures': failures,
+        }
+
 
 class SubscriptionLine(models.Model):
     _name = 'subscription.line'
@@ -516,3 +657,21 @@ class AccountMove(models.Model):
         ondelete='restrict',
         index=True,
     )
+    billing_period_start = fields.Date(
+        string='Billing Period Start',
+        copy=False,
+        index=True,
+    )
+    billing_period_end = fields.Date(
+        string='Billing Period End',
+        copy=False,
+        index=True,
+    )
+
+    _sql_constraints = [
+        (
+            'subscription_billing_period_unique',
+            'unique(subscription_id, billing_period_start, billing_period_end)',
+            'A subscription can only have one invoice for a billing period.',
+        ),
+    ]
