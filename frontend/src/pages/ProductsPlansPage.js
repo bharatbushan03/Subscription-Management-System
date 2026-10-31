@@ -6,53 +6,10 @@
 import { MetricCard } from '../components/metrics/MetricCard.js';
 import { Badge } from '../components/common/Badge.js';
 import { Button } from '../components/common/Button.js';
+import { planService } from '../services/api.js';
 
 export async function ProductsPlansPage() {
-  const plans = [
-    {
-      name: 'Starter Cloud',
-      tier: 'Tier 1',
-      priceAnnual: '$990',
-      priceMonthly: '$1,190',
-      desc: 'Core subscription billing, unified customer directory, standard invoices, and automated credit card processing.',
-      badge: 'Self-Serve',
-      badgeColor: 'neutral',
-      seats: 'Up to 10 Seats',
-      apiQuota: '100,000 req / mo',
-      gateways: 'Stripe Credit Card',
-      support: 'Standard Email SLA',
-      activeCount: '320 Active Tenants'
-    },
-    {
-      name: 'Growth Pro',
-      tier: 'Tier 2',
-      priceAnnual: '$3,450',
-      priceMonthly: '$3,950',
-      desc: 'Full automated CPQ, dunning cadence engine, Avalara multi-state sales tax calculations, and volume discounts.',
-      badge: 'Most Popular',
-      badgeColor: 'info',
-      featured: true,
-      seats: 'Up to 50 Seats & RBAC',
-      apiQuota: '5,000,000 req / mo',
-      gateways: 'Stripe + ACH / SEPA',
-      support: 'Priority 24/7 SLA',
-      activeCount: '680 Active Tenants (+14%)'
-    },
-    {
-      name: 'Enterprise Infinite',
-      tier: 'Tier 3',
-      priceAnnual: '$24,500',
-      priceMonthly: '$2,450',
-      desc: 'Unlimited enterprise seats, multi-entity NetSuite ERP sync, dedicated webhook pipelines, Okta SCIM, and 99.99% SLA.',
-      badge: 'Global Scale',
-      badgeColor: 'success',
-      seats: 'Unlimited Provisioning',
-      apiQuota: 'Unlimited Metered Usage',
-      gateways: 'Global Gateways + NetSuite GL',
-      support: 'Dedicated CSM & Solutions Eng',
-      activeCount: '420 Enterprise Accounts'
-    }
-  ];
+  const plans = await planService.list();
 
   return `
     <div class="flex flex-col w-full pb-12 animate-fade-in">
@@ -134,19 +91,19 @@ export async function ProductsPlansPage() {
               <div class="space-y-2 pt-3 border-t border-surface-container/40 text-[13px]">
                 <div class="flex items-center gap-2 text-on-surface">
                   <span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
-                  <span>${p.seats}</span>
+                  <span>${p.minimum_quantity} minimum quantity</span>
                 </div>
                 <div class="flex items-center gap-2 text-on-surface">
                   <span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
-                  <span>${p.apiQuota}</span>
+                  <span>${p.billing_frequency} billing</span>
                 </div>
                 <div class="flex items-center gap-2 text-on-surface">
                   <span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
-                  <span>${p.gateways}</span>
+                  <span>${p.available ? 'Available for selection' : 'Unavailable for selection'}</span>
                 </div>
                 <div class="flex items-center gap-2 text-on-surface">
                   <span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
-                  <span>${p.support}</span>
+                  <span>${p.allow_pause ? 'Pause permitted' : 'Pause not permitted'}</span>
                 </div>
               </div>
             </div>
@@ -161,4 +118,3 @@ export async function ProductsPlansPage() {
     </div>
   `;
 }
-

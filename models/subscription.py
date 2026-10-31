@@ -1,7 +1,12 @@
 from datetime import timedelta
+import logging
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
+from psycopg2 import IntegrityError
+
+
+_logger = logging.getLogger(__name__)
 
 
 class Subscription(models.Model):
@@ -20,6 +25,11 @@ class Subscription(models.Model):
             'subscription_renewal_unique',
             'unique(previous_subscription_id)',
             'A subscription can only be renewed once.',
+        ),
+        (
+            'subscription_quotation_unique',
+            'unique(quotation_id)',
+            'A quotation can only be converted into one subscription.',
         ),
     ]
 
@@ -100,12 +110,29 @@ class Subscription(models.Model):
         string='Invoices',
         readonly=True,
     )
+    discount_application_ids = fields.One2many(
+        'subscription.discount.application',
+        'subscription_id',
+        readonly=True,
+    )
     note = fields.Text(string='Internal Notes')
     responsible_user_id = fields.Many2one(
         'res.users',
         string='Responsible User',
         required=True,
         default=lambda self: self.env.user,
+        ondelete='restrict',
+    )
+    converted_at = fields.Datetime(
+        string='Converted At',
+        readonly=True,
+        copy=False,
+    )
+    converted_by_id = fields.Many2one(
+        'res.users',
+        string='Converted By',
+        readonly=True,
+        copy=False,
         ondelete='restrict',
     )
     amount_untaxed = fields.Monetary(
@@ -227,6 +254,17 @@ class Subscription(models.Model):
     def _post_lifecycle_message(self, message):
         for subscription in self:
             subscription.message_post(body=message)
+
+    def _get_form_action(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Subscription'),
+            'res_model': 'subscription.subscription',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     def action_create_quotation(self):
         self._check_transition(('draft',))
@@ -353,6 +391,192 @@ class Subscription(models.Model):
     @api.model
     def cron_close_expired_subscriptions(self):
         return self._close_expired_subscriptions()
+
+    def _get_billing_period(self):
+        self.ensure_one()
+        period_start = self.next_invoice_date
+        period_end = min(
+            self.plan_id.get_next_billing_date(period_start) - timedelta(days=1),
+            self.expiry_date,
+        )
+        return period_start, period_end
+
+    def _prepare_recurring_invoice_values(self, period_start, period_end):
+        self.ensure_one()
+        invoice_lines = []
+        for line in self.line_ids:
+            income_account = line.product_id.with_company(
+                self.env.company
+            )._get_product_accounts().get('income')
+            if not income_account:
+                raise UserError(
+                    _("Product '%s' has no income account.") % line.product_id.display_name
+                )
+            invoice_lines.append((0, 0, {
+                'name': line.product_id.display_name,
+                'product_id': line.product_id.id,
+                'account_id': income_account.id,
+                'quantity': line.quantity,
+                'price_unit': line.unit_price,
+                'discount': line.discount,
+                'tax_ids': [(6, 0, line.tax_ids.ids)],
+            }))
+        discount = self.env['subscription.discount'].search([
+            ('active', '=', True),
+            '|', ('company_id', '=', self.env.company.id), ('company_id', '=', False),
+        ], order='id', limit=1)
+        if discount and not discount._is_eligible(self, self.line_ids, period_start):
+            discount = self.env['subscription.discount']
+        discount_amount = 0
+        if discount:
+            eligible_lines = self.line_ids
+            if discount.scope == 'products':
+                eligible_lines = eligible_lines.filtered(
+                    lambda line: line.product_id in discount.product_ids
+                )
+            discount_base = sum(eligible_lines.mapped('subtotal'))
+            if discount.discount_type == 'percentage':
+                discount_amount = discount_base * discount.value / 100
+                for values_line in invoice_lines:
+                    values_line[2]['discount'] = discount.value
+            else:
+                discount_amount = min(discount.value, discount_base)
+                account = invoice_lines[0][2]['account_id']
+                invoice_lines.append((0, 0, {
+                    'name': _('Discount: %s') % discount.name,
+                    'account_id': account,
+                    'quantity': 1,
+                    'price_unit': -discount_amount,
+                }))
+        return {
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_id.id,
+            'currency_id': self.currency_id.id,
+            'invoice_date': period_start,
+            'invoice_payment_term_id': self.payment_term_id.id,
+            'invoice_origin': self.subscription_number,
+            'ref': _(
+                '%(subscription)s (%(start)s - %(end)s)',
+                subscription=self.subscription_number,
+                start=period_start,
+                end=period_end,
+            ),
+            'subscription_id': self.id,
+            'billing_period_start': period_start,
+            'billing_period_end': period_end,
+            'invoice_line_ids': invoice_lines,
+            '_subscription_discount': discount,
+            '_subscription_discount_amount': discount_amount,
+        }
+
+    def _create_recurring_invoice(self):
+        self.ensure_one()
+        today = fields.Date.context_today(self)
+        if (
+            self.state != 'active'
+            or self.expiry_date < today
+            or self.next_invoice_date > today
+        ):
+            return self.env['account.move']
+        period_start, period_end = self._get_billing_period()
+        Move = self.env['account.move']
+        existing = Move.search([
+            ('subscription_id', '=', self.id),
+            ('billing_period_start', '=', period_start),
+            ('billing_period_end', '=', period_end),
+        ], limit=1)
+        if existing:
+            return existing
+        values = self._prepare_recurring_invoice_values(period_start, period_end)
+        discount = values.pop('_subscription_discount', self.env['subscription.discount'])
+        discount_amount = values.pop('_subscription_discount_amount', 0)
+        try:
+            with self.env.cr.savepoint():
+                if discount and not discount._reserve_usage():
+                    discount = self.env['subscription.discount']
+                    discount_amount = 0
+                    values['invoice_line_ids'] = [
+                        line_values for line_values in values['invoice_line_ids']
+                        if not line_values[2].get('name', '').startswith('Discount: ')
+                    ]
+                    for line_values in values['invoice_line_ids']:
+                        line_values[2]['discount'] = 0
+                invoice = Move.create(values)
+                if discount:
+                    self.env['subscription.discount.application'].create({
+                        'discount_id': discount.id,
+                        'partner_id': self.partner_id.id,
+                        'subscription_id': self.id,
+                        'invoice_id': invoice.id,
+                        'amount': discount_amount,
+                        'billing_period_start': period_start,
+                        'billing_period_end': period_end,
+                        'currency_id': self.currency_id.id,
+                    })
+                next_invoice_date = self.plan_id.get_next_billing_date(period_start)
+                if next_invoice_date > self.expiry_date:
+                    next_invoice_date = self.expiry_date
+                self.write({'next_invoice_date': next_invoice_date})
+        except IntegrityError:
+            invoice = Move.search([
+                ('subscription_id', '=', self.id),
+                ('billing_period_start', '=', period_start),
+                ('billing_period_end', '=', period_end),
+            ], limit=1)
+            if not invoice:
+                raise
+        return invoice
+
+    @api.model
+    def cron_generate_recurring_invoices(self, limit=100):
+        today = fields.Date.context_today(self)
+        candidates = self.search([
+            ('state', '=', 'active'),
+            ('next_invoice_date', '<=', today),
+            ('expiry_date', '>=', today),
+        ], limit=limit, order='next_invoice_date, id')
+        if not candidates:
+            return {'processed': 0, 'invoices': 0, 'failures': 0}
+        self.env.cr.execute(
+            """
+                SELECT id
+                  FROM subscription_subscription
+                 WHERE id = ANY(%s)
+                   AND state = 'active'
+                   AND next_invoice_date <= %s
+                   AND expiry_date >= %s
+                 FOR UPDATE SKIP LOCKED
+            """,
+            [candidates.ids, today, today],
+        )
+        locked = self.browse(row[0] for row in self.env.cr.fetchall())
+        invoices = self.env['account.move']
+        failures = 0
+        for subscription in locked:
+            try:
+                with self.env.cr.savepoint():
+                    while (
+                        subscription.state == 'active'
+                        and subscription.next_invoice_date <= today
+                        and subscription.next_invoice_date <= subscription.expiry_date
+                    ):
+                        previous_date = subscription.next_invoice_date
+                        invoice = subscription._create_recurring_invoice()
+                        invoices |= invoice
+                        if subscription.next_invoice_date == previous_date:
+                            break
+            except Exception:
+                failures += 1
+                _logger.exception(
+                    "Recurring billing failed for subscription %s (id=%s)",
+                    subscription.subscription_number,
+                    subscription.id,
+                )
+        return {
+            'processed': len(locked),
+            'invoices': len(invoices),
+            'failures': failures,
+        }
 
 
 class SubscriptionLine(models.Model):
@@ -488,3 +712,76 @@ class AccountMove(models.Model):
         ondelete='restrict',
         index=True,
     )
+    discount_application_ids = fields.One2many(
+        'subscription.discount.application',
+        'invoice_id',
+        readonly=True,
+    )
+    billing_period_start = fields.Date(
+        string='Billing Period Start',
+        copy=False,
+        index=True,
+    )
+    billing_period_end = fields.Date(
+        string='Billing Period End',
+        copy=False,
+        index=True,
+    )
+    subscription_overdue = fields.Boolean(
+        compute='_compute_subscription_overdue',
+        search='_search_subscription_overdue',
+    )
+
+    _sql_constraints = [
+        (
+            'subscription_billing_period_unique',
+            'unique(subscription_id, billing_period_start, billing_period_end)',
+            'A subscription can only have one invoice for a billing period.',
+        ),
+    ]
+
+    @api.depends('state', 'payment_state', 'invoice_date_due', 'amount_residual')
+    def _compute_subscription_overdue(self):
+        today = fields.Date.context_today(self)
+        for invoice in self:
+            invoice.subscription_overdue = bool(
+                invoice.move_type in ('out_invoice', 'out_refund')
+                and invoice.state == 'posted'
+                and invoice.payment_state not in ('paid', 'reversed')
+                and invoice.amount_residual > 0
+                and invoice.invoice_date_due
+                and invoice.invoice_date_due < today
+            )
+
+    @api.model
+    def _search_subscription_overdue(self, operator, value):
+        if operator not in ('=', '!=') or not isinstance(value, bool):
+            raise ValidationError(_("Unsupported overdue search."))
+        today = fields.Date.context_today(self)
+        domain = [
+            ('move_type', 'in', ('out_invoice', 'out_refund')),
+            ('state', '=', 'posted'),
+            ('payment_state', 'not in', ('paid', 'reversed')),
+            ('amount_residual', '>', 0),
+            ('invoice_date_due', '<', today),
+        ]
+        if value == (operator == '='):
+            return domain
+        return [('id', 'not in', self.search(domain).ids)]
+
+    def action_open_subscription(self):
+        self.ensure_one()
+        if not self.subscription_id:
+            return False
+        return self.subscription_id._get_form_action()
+
+    def get_payment_register_action(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Register Payment'),
+            'res_model': 'account.payment.register',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'active_model': 'account.move', 'active_ids': self.ids},
+        }

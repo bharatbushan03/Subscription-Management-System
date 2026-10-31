@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_subscriptions" name="Portal Subscriptions">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h2>Subscriptions</h2>
+                <table class="table">
+                    <tr><th>Number</th><th>Plan</th><th>Status</th><th>Next Billing</th></tr>
+                    <t t-foreach="subscriptions" t-as="subscription">
+                        <tr>
+                            <td><a t-att-href="'/my/subscription/%s' % subscription.id"><t t-esc="subscription.subscription_number"/></a></td>
+                            <td><t t-esc="subscription.plan_id.display_name"/></td>
+                            <td><t t-esc="subscription.state"/></td>
+                            <td><t t-esc="subscription.next_invoice_date"/></td>
+                        </tr>
+                    </t>
+                </table>
+            </div>
+        </t>
+    </template>
+    <template id="portal_subscription" name="Portal Subscription">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h2><t t-esc="subscription.subscription_number"/></h2>
+                <p>Plan: <t t-esc="subscription.plan_id.display_name"/></p>
+                <p>Status: <t t-esc="subscription.state"/></p>
+                <p>Start: <t t-esc="subscription.start_date"/> | Expiry: <t t-esc="subscription.expiry_date"/></p>
+                <p>Total: <t t-esc="subscription.amount_total"/></p>
+            </div>
+        </t>
+    </template>
+    <template id="portal_invoices" name="Portal Invoices">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h2>Invoices</h2>
+                <table class="table">
+                    <tr><th>Invoice</th><th>Date</th><th>Total</th><th>Due</th><th>Status</th></tr>
+                    <t t-foreach="invoices" t-as="invoice">
+                        <tr>
+                            <td><a t-att-href="'/my/invoice/%s' % invoice.id"><t t-esc="invoice.name"/></a></td>
+                            <td><t t-esc="invoice.invoice_date"/></td>
+                            <td><t t-esc="invoice.amount_total"/></td>
+                            <td><t t-esc="invoice.invoice_date_due"/></td>
+                            <td><t t-esc="invoice.payment_state"/></td>
+                        </tr>
+                    </t>
+                </table>
+            </div>
+        </t>
+    </template>
+    <template id="portal_invoice" name="Portal Invoice">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h2><t t-esc="invoice.name"/></h2>
+                <p>Subscription: <t t-esc="invoice.subscription_id.subscription_number"/></p>
+                <p>Total: <t t-esc="invoice.amount_total"/> | Due: <t t-esc="invoice.amount_residual"/></p>
+                <a class="btn btn-primary" t-att-href="'/my/invoice/%s/pdf' % invoice.id">Download invoice</a>
+            </div>
+        </t>
+    </template>
+    <template id="portal_payments" name="Portal Payments">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h2>Payments</h2>
+                <table class="table">
+                    <tr><th>Reference</th><th>Date</th><th>Amount</th><th>Status</th></tr>
+                    <t t-foreach="payments" t-as="payment">
+                        <tr><td><t t-esc="payment.name"/></td><td><t t-esc="payment.date"/></td><td><t t-esc="payment.amount"/></td><td><t t-esc="payment.state"/></td></tr>
+                    </t>
+                </table>
+            </div>
+        </t>
+    </template>
+    <template id="portal_quotations" name="Portal Quotations">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h2>Quotations</h2>
+                <table class="table">
+                    <tr><th>Quotation</th><th>Date</th><th>Total</th><th>Status</th></tr>
+                    <t t-foreach="quotations" t-as="quotation">
+                        <tr><td><t t-esc="quotation.name"/></td><td><t t-esc="quotation.date_order"/></td><td><t t-esc="quotation.amount_total"/></td><td><t t-esc="quotation.state"/></td></tr>
+                    </t>
+                </table>
+            </div>
+        </t>
+    </template>
+</odoo>
