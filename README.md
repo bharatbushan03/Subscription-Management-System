@@ -70,6 +70,22 @@ carry `subscription_plan_id` when the quotation-level plan is empty; if both
 are set, they must match. Customer-facing `action_customer_accept` and
 `action_customer_reject` actions are available for open quotations. Quotation
 creation remains separate from subscription activation and conversion.
+
+Accepted quotations (`sale.order.state = sale`) can be converted by subscription
+staff or administrators with `action_convert_to_subscription()`. The action
+creates exactly one linked `subscription.subscription`, copies customer,
+plan, payment terms, currency, quotation dates, products, variants, quantities,
+prices, discounts, and taxes, then advances the subscription through quotation
+and confirmation lifecycle methods. It activates immediately when the selected
+start date is today or earlier; future-start subscriptions remain confirmed.
+The subscription stores `converted_at` and `converted_by_id` in addition to
+the copied responsible sales user.
+
+The conversion fields are `subscription_start_date`,
+`subscription_expiry_date`, and readonly `subscription_id`. Conversion is
+blocked for rejected, draft, sent, or expired quotations, and the unique
+`subscription.quotation_id` constraint plus a savepoint prevents duplicate
+conversions. Repeated conversion returns the existing subscription form action.
 > **Brightloop Enterprise Billing & Subscription Management Platform**
 
 A production-grade, enterprise SaaS architecture designed for high-precision subscription lifecycle management, recurring revenue telemetry (MRR/ARR), plan tiering, and billing automation.

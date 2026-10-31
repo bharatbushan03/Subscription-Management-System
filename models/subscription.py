@@ -21,6 +21,11 @@ class Subscription(models.Model):
             'unique(previous_subscription_id)',
             'A subscription can only be renewed once.',
         ),
+        (
+            'subscription_quotation_unique',
+            'unique(quotation_id)',
+            'A quotation can only be converted into one subscription.',
+        ),
     ]
 
     subscription_number = fields.Char(
@@ -106,6 +111,18 @@ class Subscription(models.Model):
         string='Responsible User',
         required=True,
         default=lambda self: self.env.user,
+        ondelete='restrict',
+    )
+    converted_at = fields.Datetime(
+        string='Converted At',
+        readonly=True,
+        copy=False,
+    )
+    converted_by_id = fields.Many2one(
+        'res.users',
+        string='Converted By',
+        readonly=True,
+        copy=False,
         ondelete='restrict',
     )
     amount_untaxed = fields.Monetary(
@@ -227,6 +244,17 @@ class Subscription(models.Model):
     def _post_lifecycle_message(self, message):
         for subscription in self:
             subscription.message_post(body=message)
+
+    def _get_form_action(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Subscription'),
+            'res_model': 'subscription.subscription',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     def action_create_quotation(self):
         self._check_transition(('draft',))

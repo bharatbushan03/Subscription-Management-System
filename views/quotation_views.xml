@@ -5,11 +5,21 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_convert_to_subscription"
+                        type="object"
+                        string="Convert to Subscription"
+                        class="btn-primary"
+                        invisible="state != 'sale' or subscription_id"/>
+            </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="subscription_plan_id"/>
+                <field name="subscription_id" readonly="1"/>
             </xpath>
             <xpath expr="//field[@name='validity_date']" position="after">
                 <field name="quotation_expired" readonly="1"/>
+                <field name="subscription_start_date"/>
+                <field name="subscription_expiry_date"/>
             </xpath>
         </field>
     </record>

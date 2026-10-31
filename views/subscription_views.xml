@@ -51,6 +51,8 @@
                             <field name="plan_id"/>
                             <field name="quotation_id"/>
                             <field name="responsible_user_id"/>
+                            <field name="converted_by_id"/>
+                            <field name="converted_at"/>
                             <field name="state"/>
                         </group>
                         <group>
