@@ -22,6 +22,9 @@ A production-grade, enterprise SaaS architecture designed for high-precision sub
 ### 5. Churn & Retention Telemetry / Revenue Analytics
 ![Churn & Retention Telemetry](docs/screenshots/churn-retention-preview.jpg)
 
+### 6. Organization Settings & Access Governance
+![Organization Settings & Access Governance](docs/screenshots/organization-settings-preview.jpg)
+
 The complete design specification and design token standards are documented in [docs/DESIGN.md](docs/DESIGN.md).
 
 ---
@@ -99,6 +102,7 @@ Open any interactive prototype directly in any modern browser or via live server
 - **Invoices & Receipts Ledger:** [`invoices-receipts.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/invoices-receipts.html) or `frontend/public/invoices-receipts.html`
 - **Tax & General Ledgers / Dunning:** [`tax-ledgers.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/tax-ledgers.html) or `frontend/public/tax-ledgers.html`
 - **Churn & Retention Telemetry:** [`churn-retention.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/churn-retention.html) or `frontend/public/churn-retention.html`
+- **Organization Settings & Governance:** [`organization-settings.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/organization-settings.html) or `frontend/public/organization-settings.html`
 
 ### 2. Run the Backend API Service
 ```bash
