@@ -51,6 +51,25 @@ must be ordered, currencies must match the plan, and line quantities/prices
 must be valid. Customers can only read subscriptions belonging to their
 commercial partner; staff can create and edit subscriptions, while
 administrators have full access.
+
+## Quotation management contract
+
+Quotation management extends Odoo's native `sale.order`, `sale.order.line`,
+and `sale.order.template` models. Quotations use the native `draft`, `sent`,
+`sale`, and `cancel` states and retain Odoo's reference, totals, email, PDF,
+and portal behavior.
+
+The added quotation fields are `subscription_plan_id` (many2one
+`subscription.plan`) and computed `quotation_expired` (boolean). Templates
+add `applicable_plan_ids` (many2many `subscription.plan`). Use
+`number_of_days` for template validity in Odoo 19.
+
+Quotation validation checks plan availability, template plan restrictions,
+plan product compatibility, minimum quantities, and validity dates. A line may
+carry `subscription_plan_id` when the quotation-level plan is empty; if both
+are set, they must match. Customer-facing `action_customer_accept` and
+`action_customer_reject` actions are available for open quotations. Quotation
+creation remains separate from subscription activation and conversion.
 > **Brightloop Enterprise Billing & Subscription Management Platform**
 
 A production-grade, enterprise SaaS architecture designed for high-precision subscription lifecycle management, recurring revenue telemetry (MRR/ARR), plan tiering, and billing automation.

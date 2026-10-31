@@ -17,8 +17,18 @@ class SaleOrderLine(models.Model):
 
     @api.constrains('subscription_plan_id', 'product_id', 'product_uom_qty')
     def _check_subscription_plan_line(self):
-        for line in self.filtered('subscription_plan_id'):
-            plan = line.subscription_plan_id
+        for line in self.filtered(lambda line: (
+            line.subscription_plan_id or line.order_id.subscription_plan_id
+        )):
+            plan = line.subscription_plan_id or line.order_id.subscription_plan_id
+            if (
+                line.subscription_plan_id
+                and line.order_id.subscription_plan_id
+                and line.order_id.subscription_plan_id != plan
+            ):
+                raise ValidationError(_(
+                    "A quotation line plan must match the quotation plan."
+                ))
             plan._check_available_for_new_subscription()
             plan.validate_quantity(line.product_uom_qty)
             if not plan.line_ids.filtered(lambda plan_line: plan_line.matches_product(line.product_id)):

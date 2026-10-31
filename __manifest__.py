@@ -23,6 +23,7 @@
         'data/subscription_cron.xml',
         'views/subscription_plan_views.xml',
         'views/subscription_views.xml',
+        'views/quotation_views.xml',
     ],
     'installable': True,
     'application': True,

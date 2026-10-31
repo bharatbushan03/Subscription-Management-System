@@ -107,4 +107,14 @@
         <field name="domain_force">[('subscription_id.partner_id', 'child_of', [user.commercial_partner_id.id])]</field>
         <field name="groups" eval="[(4, ref('group_subscription_customer'))]"/>
     </record>
+
+    <record id="access_sale_order_template_line_subscription_staff" model="ir.model.access">
+        <field name="name">sale.order.template.line.subscription.staff</field>
+        <field name="model_id" search="[('model', '=', 'sale.order.template.line')]"/>
+        <field name="group_id" ref="group_subscription_staff"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
 </odoo>
