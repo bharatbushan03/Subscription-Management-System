@@ -1,238 +1,101 @@
-# Subscription Management
+# Subscription Management System
 
-## Subscription plan frontend contract
+A full-stack subscription and billing platform built around an Odoo 19 module plus a lightweight Node.js API and a modern frontend dashboard.
 
-The plan-management phase exposes these Odoo models:
+This repository combines:
+- an Odoo-based subscription management addon
+- a backend REST API for billing and subscription operations
+- a Vite frontend for customer and revenue dashboards
+- static HTML prototypes and design assets for product exploration
 
-- `subscription.plan`: `name` (char), `description` (text),
-  `recurring_price` (monetary), `currency_id` (many2one `res.currency`),
-  `billing_frequency` (selection), `minimum_quantity` (float),
-  `available_from`/`available_until` (date), `automatic_closure`,
-  `allow_early_closure`, `allow_pause`, `allow_renewal`, and `active` (boolean),
-  and `line_ids` (one2many `subscription.plan.line`).
-- `subscription.plan.line`: `plan_id` (many2one), `product_tmpl_id` (product
-  reference), `product_id` (optional product variant), `minimum_quantity`
-  (float), `unit_price` (monetary), `currency_id` (related currency),
-  `tax_ids` (many2many `account.tax`), and `active` (boolean).
+## Overview
 
-Use the exact billing-frequency values `daily`, `weekly`, `monthly`, and
-`yearly`. Next billing dates use calendar arithmetic, so month ends and leap
-days are preserved correctly.
+The project is designed for subscription lifecycle management, recurring billing, quotation conversion, and operational visibility across plans, subscriptions, invoices, and customer accounts.
 
-Available actions are plan create, edit, activate, and archive for
-`group_subscription_admin`. Staff can read available plans and use them on a
-quotation line through `sale.order.line.subscription_plan_id`. Customers can
-read only active plans within their availability dates. New quotation lines
-must use an available plan, an active product line, and a quantity at least
-the plan minimum. Expired and inactive plans are rejected.
+Core capabilities include:
+- subscription plan definition and validation
+- customer-facing quotation workflows
+- subscription generation from approved quotations
+- recurring invoice processing
+- billing and revenue analytics
+- portal access and role-based permissions
+- dashboard and reporting views
 
-The backend methods `is_available`, `validate_quantity`,
-`get_next_billing_date`, `automatic_closure_applies`, `can_pause`,
-`can_close_early`, and `can_renew` are the frontend's permission and
-calculation contract. Invoice generation and subscription records are not part
-of this phase.
+## Tech stack
 
-## Subscription database contract
+- Python: Odoo module, models, security, views, business rules
+- JavaScript: Node.js API service and Vite frontend
+- HTML/CSS: marketing pages, prototypes, UI mockups, static views
+- Docker: local deployment and orchestration
 
-The database phase adds `subscription.subscription` and `subscription.line`.
-Subscriptions use states `draft`, `quotation`, `confirmed`, `active`, `paused`,
-and `closed`. Subscription numbers are generated as `SUB/YYYY/00001`.
-
-The subscription contains `partner_id`, `plan_id`, `start_date`,
-`expiry_date`, `next_invoice_date`, `payment_term_id`, `currency_id`, `state`,
-`quotation_id`, `line_ids`, `invoice_ids`, `note`, `responsible_user_id`, and
-the computed `amount_untaxed`, `amount_tax`, and `amount_total` fields.
-Subscription lines contain `product_id`, `quantity`, `unit_price`, `tax_ids`,
-`discount`, `currency_id`, `subtotal`, `tax_amount`, and `total`.
-
-Subscription lines reuse `account.tax.compute_all`; no separate tax engine is
-introduced. A subscription must have at least one active plan product, dates
-must be ordered, currencies must match the plan, and line quantities/prices
-must be valid. Customers can only read subscriptions belonging to their
-commercial partner; staff can create and edit subscriptions, while
-administrators have full access.
-
-## Quotation management contract
-
-Quotation management extends Odoo's native `sale.order`, `sale.order.line`,
-and `sale.order.template` models. Quotations use the native `draft`, `sent`,
-`sale`, and `cancel` states and retain Odoo's reference, totals, email, PDF,
-and portal behavior.
-
-The added quotation fields are `subscription_plan_id` (many2one
-`subscription.plan`) and computed `quotation_expired` (boolean). Templates
-add `applicable_plan_ids` (many2many `subscription.plan`). Use
-`number_of_days` for template validity in Odoo 19.
-
-Quotation validation checks plan availability, template plan restrictions,
-plan product compatibility, minimum quantities, and validity dates. A line may
-carry `subscription_plan_id` when the quotation-level plan is empty; if both
-are set, they must match. Customer-facing `action_customer_accept` and
-`action_customer_reject` actions are available for open quotations. Quotation
-creation remains separate from subscription activation and conversion.
-
-Accepted quotations (`sale.order.state = sale`) can be converted by subscription
-staff or administrators with `action_convert_to_subscription()`. The action
-creates exactly one linked `subscription.subscription`, copies customer,
-plan, payment terms, currency, quotation dates, products, variants, quantities,
-prices, discounts, and taxes, then advances the subscription through quotation
-and confirmation lifecycle methods. It activates immediately when the selected
-start date is today or earlier; future-start subscriptions remain confirmed.
-The subscription stores `converted_at` and `converted_by_id` in addition to
-the copied responsible sales user.
-
-The conversion fields are `subscription_start_date`,
-`subscription_expiry_date`, and readonly `subscription_id`. Conversion is
-blocked for rejected, draft, sent, or expired quotations, and the unique
-`subscription.quotation_id` constraint plus a savepoint prevents duplicate
-conversions. Repeated conversion returns the existing subscription form action.
-
-## Recurring billing contract
-
-`subscription.subscription.cron_generate_recurring_invoices()` processes
-active subscriptions whose `next_invoice_date` is due. It creates native
-`account.move` customer invoices in draft state, with native invoice lines,
-taxes, discounts, payment terms, and currency. Each invoice stores
-`subscription_id`, `billing_period_start`, and `billing_period_end`, and the
-subscription's next date advances only after successful creation.
-
-The scheduled action `ir_cron_generate_recurring_invoices` runs daily in
-batches of 100. Paused, closed, and expired subscriptions are excluded.
-Calendar-aware plan billing dates determine each covered period. A database
-unique constraint on `(subscription_id, billing_period_start,
-billing_period_end)`, plus row locking with `SKIP LOCKED`, prevents duplicate
-invoices when jobs overlap or retry. A failure is rolled back to its savepoint,
-logged with the subscription number and ID, and does not stop other
-subscriptions in the batch.
-
-## Phases 11-16 backend contract
-
-Invoices remain native `account.move` records. The addon adds
-`subscription_overdue`, billing-period fields, subscription navigation, and
-native payment-register actions; invoice posting, cancellation, email, PDF,
-payment reconciliation, and payment states remain Odoo Accounting behavior.
-
-Administrators manage `subscription.discount` rules. Supported fields include
-`discount_type` (`fixed` or `percentage`), `value`, validity dates, usage
-limits, product/plan scope, currency, and company. Applications are recorded
-in `subscription.discount.application`, uniquely per discount and invoice.
-Recurring billing applies one eligible rule per billing period, reserves usage
-under a database row lock, and rolls back both invoice and usage on failure.
-
-Customer portal routes are `/my/subscriptions`, `/my/subscription/<id>`,
-`/my/invoices`, `/my/invoice/<id>`, `/my/invoice/<id>/pdf`, `/my/payments`,
-and `/my/quotations`. Each route validates commercial-partner ownership on the
-server. Admin/Staff dashboard consumers can call
-`subscription.subscription.get_dashboard_kpis()`,
-`get_recurring_revenue_metrics()`, `get_revenue_report()`, and
-`get_plan_distribution()`; collected revenue uses paid native payments, while
-MRR normalizes daily, weekly, monthly, and yearly plan prices.
-> **Brightloop Enterprise Billing & Subscription Management Platform**
-
-A production-grade, enterprise SaaS architecture designed for high-precision subscription lifecycle management, recurring revenue telemetry (MRR/ARR), plan tiering, automated collections, and billing automation.
-
----
-
-## 📸 Previews
-
-### 1. Executive Telemetry & Plans Dashboard
-![Dashboard Overview](docs/screenshots/dashboard-preview.png)
-
-### 2. Customer 360 & Subscription Lifecycle View
-![Customer Detail Overview](docs/screenshots/customer-detail-preview.jpg)
-
-### 3. Invoices, Receipts & Global Tax Reconciliation Ledger
-![Invoices & Receipts Overview](docs/screenshots/invoices-receipts-preview.jpg)
-
-### 4. Tax & General Ledgers / Payments & Dunning
-![Tax & General Ledgers Overview](docs/screenshots/tax-ledgers-preview.jpg)
-
-### 5. Churn & Retention Telemetry / Revenue Analytics
-![Churn & Retention Telemetry](docs/screenshots/churn-retention-preview.jpg)
-
-### 6. Organization Settings & Access Governance
-![Organization Settings & Access Governance](docs/screenshots/organization-settings-preview.jpg)
-
-The complete design specification and design token standards are documented in [docs/DESIGN.md](docs/DESIGN.md), and the SPA frontend engineering architecture is detailed in [docs/FRONTEND_ARCHITECTURE.md](docs/FRONTEND_ARCHITECTURE.md).
-
----
-
-## 🏗️ Project Architecture & Directory Structure
-
-This repository follows industry-standard separation of concerns for modern multi-tier SaaS and Odoo enterprise modules:
+## Repository structure
 
 ```text
-Subscription-Management-System/
-├── docs/                                  # Product and Design Documentation
-│   ├── DESIGN.md                          # UI/UX design system tokens, typography, and color palette
-│   └── screenshots/                       # High-fidelity visual mockups and component previews
-│       ├── dashboard-preview.png          # Main billing dashboard preview
-│       ├── customer-detail-preview.jpg    # Customer 360 & dunning detail preview
-│       └── invoices-receipts-preview.png  # Invoices & receipts ledger preview
-├── frontend/                              # Frontend Web Application & Dashboard
-│   ├── public/                            # Static assets
-│   │   ├── index.html                     # Live dashboard prototype (code.html)
-│   │   ├── customer-detail.html           # Live customer 360 & lifecycle detail prototype
-│   │   └── invoices-receipts.html         # Live invoices & receipts ledger prototype
-│   ├── src/                               # Modular UI components
-│   │   ├── components/                    # Common, layout, and metrics components
-│   │   ├── pages/                         # Overview, customer, and billing views
-│   │   ├── styles/                        # CSS design tokens mapped from DESIGN.md
-│   │   │   └── tokens.css
-│   │   └── main.js
-│   ├── index.html                         # Bundler entry point
-│   ├── customer-detail.html
-│   ├── invoices-receipts.html
-│   └── package.json
-├── backend/                               # REST API & Billing Microservice
+.
+├── __manifest__.py                 # Odoo module manifest
+├── __init__.py                    # Odoo package init
+├── backend/                       # Node.js REST API service
 │   ├── src/
-│   │   ├── config/                        # Database & environment configurations
-│   │   ├── controllers/                   # Request handlers (subscriptions, analytics)
-│   │   ├── models/                        # Domain entities (Subscription, Customer, Plan, Invoice)
-│   │   ├── routes/                        # Express API route declarations
-│   │   ├── services/                      # Business logic (pricing calculator, MRR aggregator)
-│   │   └── server.js                      # Application server entry point
-│   ├── .env.example
+│   ├── test/
+│   ├── package.json
+│   └── .env.example
+├── frontend/                      # Vite frontend app
+│   ├── src/
+│   ├── public/
 │   └── package.json
-├── static/                                # Odoo module static assets
-│   └── description/                       # Odoo app description, views & screenshots
-│       ├── index.html
-│       ├── customer-detail.html
-│       ├── invoices-receipts.html
-│       ├── screen.png
-│       ├── customer-detail-preview.jpg
-│       └── invoices-receipts-preview.png
-├── models/                                # Odoo ORM Models
-├── views/                                 # Odoo XML Views
-├── security/                              # Access control & record rules
-├── controllers/                           # Odoo HTTP Controllers
-├── code.html                              # Root standalone dashboard
-├── customer-detail.html                   # Root standalone customer 360 view
-├── invoices-receipts.html                 # Root standalone invoices & receipts view
-├── DESIGN.md                              # Root design system documentation
-├── screen.png                             # Root dashboard preview image
-├── screen-customer.jpg                    # Root customer detail preview image
-├── screen-invoices.png                    # Root invoices preview image
-├── docker-compose.yml                     # Odoo container configuration
-├── __manifest__.py                        # Odoo module manifest
-├── .gitignore
-└── README.md
+├── models/                        # Odoo model definitions
+├── views/                         # Odoo XML views
+├── security/                      # Access controls and record rules
+├── controllers/                   # Odoo controllers
+├── data/                          # Module data and cron definitions
+├── reports/                       # Reporting assets
+├── static/                        # Odoo static assets and previews
+├── docs/                          # Project documentation and design specs
+├── tests/                         # Test suite and validation scripts
+├── code.html                      # Root dashboard prototype
+├── customer-detail.html           # Root customer detail prototype
+├── invoices-receipts.html         # Root invoice ledger prototype
+├── churn-retention.html           # Root churn analysis prototype
+├── tax-ledgers.html               # Root tax/ledger prototype
+├── organization-settings.html      # Root settings prototype
+├── docker-compose.yml             # Multi-service deployment config
+├── deploy.sh / deploy.ps1         # Environment deployment scripts
+├── DESIGN.md                     # Design system documentation
+├── README.md                     # Project documentation
+├── test_complete_application.js   # Full-stack validation runner
+└── .gitignore
 ```
 
----
+## Features
 
-## 🚀 Quick Start Guide
+### Subscription lifecycle
+- manage subscription plans with billing frequency and validity rules
+- validate plan and product availability during quotation creation
+- convert approved quotations into subscriptions
+- handle activation, pause, renewal, and closure states
 
-### 1. View the Interactive UI Prototypes
-Open any interactive prototype directly in any modern browser or via live server:
-- **Executive Dashboard:** [`code.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/code.html) or `frontend/public/index.html`
-- **Customer 360 Detail View:** [`customer-detail.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/customer-detail.html) or `frontend/public/customer-detail.html`
-- **Invoices & Receipts Ledger:** [`invoices-receipts.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/invoices-receipts.html) or `frontend/public/invoices-receipts.html`
-- **Tax & General Ledgers / Dunning:** [`tax-ledgers.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/tax-ledgers.html) or `frontend/public/tax-ledgers.html`
-- **Churn & Retention Telemetry:** [`churn-retention.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/churn-retention.html) or `frontend/public/churn-retention.html`
-- **Organization Settings & Governance:** [`organization-settings.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/organization-settings.html) or `frontend/public/organization-settings.html`
+### Billing and invoicing
+- recurring invoice generation based on subscription schedules
+- tax, currency, and payment-term support
+- revenue metrics and recurring analytics
 
-### 2. Run the Backend API Service
+### Governance and reporting
+- role-based access control
+- discount and monitoring logic
+- customer 360 views, revenue dashboards, and operational reports
+
+## Quick start
+
+### 1. Frontend UI prototypes
+Open any of the HTML prototypes directly in a browser, or run the frontend app:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 2. Backend API
 ```bash
 cd backend
 npm install
@@ -240,57 +103,46 @@ cp .env.example .env
 npm run dev
 ```
 
+### 3. Odoo module setup
+This project includes an Odoo addon. For local installation:
 
-### 3. Run the Modern Frontend Web Application
 ```bash
-cd frontend
-npm install
-npm run dev     # Starts Vite dev server on http://localhost:3000
-npm run build   # Compiles production assets into dist/
-```
-
-### 4. Automated Multi-Tier Docker Deployment
-Deploy the full enterprise stack (PostgreSQL 16, Odoo 19, Node.js API Gateway, and Nginx SPA client) with one command:
-
-**Linux / macOS:**
-```bash
-./deploy.sh
-```
-
-**Windows PowerShell:**
-```powershell
-.\deploy.ps1
-```
-
-Or via standard Docker Compose:
-```bash
+# run Odoo via Docker
 docker compose up -d
 ```
 
----
+Then install the module in your Odoo instance and configure the required database and environment variables.
 
-## 🧪 Comprehensive Automated Test Suite
+## Documentation
 
-Run the master test runner to verify all tiers (Odoo static schema, Python compilation, Backend REST API, and Frontend SPA):
+Detailed project references are available in `docs/`:
+- `docs/DESIGN.md`
+- `docs/DEPLOYMENT_GUIDE.md`
+- `docs/API_DOCUMENTATION.md`
+- `docs/USER_MANUAL.md`
+- `docs/FRONTEND_ARCHITECTURE.md`
 
-```bash
-# Run complete test suite across all application tiers
-node ../test_complete_application.js
+## Development notes
 
-# Or test individual modules:
-npm --prefix backend test     # Run 25 backend integration & lifecycle tests
-npm --prefix frontend test    # Run 19 frontend bundling & component tests
-python tests/test_odoo_module_static.py  # Run Odoo schema & rule tests
-```
+The repository is structured to support a multi-tier SaaS domain model:
+- Odoo handles the business logic and model layer
+- Node.js exposes API endpoints for application services
+- the frontend provides dashboard and customer experiences
+- static HTML files act as prototype and design review surfaces
 
----
+## License
 
-## 📚 Complete Project Documentation
+This project is distributed under the LGPL-3 license as declared in the Odoo module manifest.
 
-Detailed technical and operational documentation is available in the `docs/` directory:
+## Contributing
 
-- 🚀 **[Production Deployment Guide](docs/DEPLOYMENT_GUIDE.md):** Architecture topology, Docker orchestration, bare-metal service setup, SSL/TLS hardening, and disaster recovery.
-- 📡 **[REST API Specification](docs/API_DOCUMENTATION.md):** Full OpenAPI reference for subscriptions, lifecycles, analytics, customers, invoices, dunning, taxes, and RBAC governance.
-- 📖 **[User Manual & Operations Guide](docs/USER_MANUAL.md):** Operator walkthrough for Customer 360, plan tier modifications, smart dunning retries, and nexus monitoring.
-- 🎨 **[Design System Specification](docs/DESIGN.md):** Design tokens, typographic scales, and color system.
-- 💻 **[Frontend Architecture](docs/FRONTEND_ARCHITECTURE.md):** SPA state store, routing, component hierarchy, and API client design.
+Contributions are welcome. To contribute:
+1. fork the repository
+2. create a feature branch
+3. make your changes
+4. run the relevant tests or validation scripts
+5. open a pull request
+
+## Project status
+
+The repository is organized as an enterprise-grade subscription management platform prototype and starter implementation, with both domain logic and frontend presentation layers included in the same codebase.
