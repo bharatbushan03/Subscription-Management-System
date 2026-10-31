@@ -2,8 +2,7 @@
  * Brightloop API Client — Fully Connected Service Layer
  * Handles JWT auth, all REST endpoints, and error normalization.
  */
-
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // ─── JWT Token Management ─────────────────────────────────────────────────────
 
