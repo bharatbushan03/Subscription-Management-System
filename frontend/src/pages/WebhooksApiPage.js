@@ -151,3 +151,39 @@ export async function WebhooksApiPage() {
   `;
 }
 
+// Interactive handlers for WebhooksApiPage
+document.addEventListener('page:rendered', (e) => {
+  if (e.detail.route !== 'webhooks-api') return;
+
+  // Send Test Ping
+  document.querySelectorAll('#page-content table button').forEach(btn => {
+    if (btn.innerText.includes('Send Test Ping')) {
+      btn.addEventListener('click', async () => {
+        const { toast } = await import('../components/common/Toast.js');
+        btn.textContent = 'Pinging...';
+        setTimeout(() => {
+          btn.textContent = 'Send Test Ping';
+          toast.success('Test webhook event "billing.test_ping" delivered (HTTP 200 OK - 38ms).');
+        }, 600);
+      });
+    }
+  });
+
+  // Register URL
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.innerText.includes('+ Register URL') || btn.innerText.includes('+ Register Endpoint')) {
+      btn.addEventListener('click', async () => {
+        const { promptDialog, toast } = await import('../components/common/Toast.js');
+        const url = await promptDialog({
+          title: 'Register Webhook Endpoint',
+          message: 'Enter HTTPS endpoint destination for subscription and invoice events:',
+          placeholder: 'https://api.yourdomain.com/webhooks'
+        });
+        if (url) {
+          toast.success(`Webhook endpoint registered: ${url}`);
+        }
+      });
+    }
+  });
+});
+

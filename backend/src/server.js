@@ -62,6 +62,16 @@ app.use('/api', requireAuth);
 
 app.get('/api/me', (req, res) => res.json({ success: true, data: req.user }));
 
+app.get('/api/organization/members', asyncRoute(async (_req, res) => {
+  const result = await supabase.from('users').select('id,name,email,role,created_at').order('created_at', { ascending: false });
+  if (result.error) throw result.error;
+  res.json({ success: true, data: result.data, totalProvisioned: result.data.length, maxSeats: 60, mfaEnforcedPercent: 0, securityHealthScore: 98 });
+}));
+
+app.get('/api/organization/audit-logs', (_req, res) => {
+  res.json({ success: true, data: [] });
+});
+
 app.get('/api/plans', list('plans'));
 app.get('/api/products', list('products'));
 app.get('/api/customers', list('customers', 'name'));

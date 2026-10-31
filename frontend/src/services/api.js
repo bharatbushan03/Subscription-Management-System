@@ -47,6 +47,21 @@ export const identityService = {
   }
 };
 
+export const organizationService = {
+  listMembers() {
+    return fetchJson('/organization/members');
+  },
+  getAuditLogs() {
+    return fetchJson('/organization/audit-logs');
+  },
+  invite(data) {
+    return fetchJson('/organization/invite', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+};
+
 export const authService = {
   login(email, password) {
     return fetchJson('/auth/login', {
