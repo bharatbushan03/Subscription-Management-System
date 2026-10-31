@@ -10,16 +10,24 @@ import { InvoicesPage } from './pages/InvoicesPage.js';
 import { TaxLedgersPage } from './pages/TaxLedgersPage.js';
 import { ChurnRetentionPage } from './pages/ChurnRetentionPage.js';
 import { OrganizationSettingsPage } from './pages/OrganizationSettingsPage.js';
+import { ProductsPlansPage } from './pages/ProductsPlansPage.js';
+import { PaymentsDunningPage } from './pages/PaymentsDunningPage.js';
+import { WebhooksApiPage } from './pages/WebhooksApiPage.js';
 
 const routes = {
   '': DashboardPage,
   'dashboard': DashboardPage,
+  'products-plans': ProductsPlansPage,
+  'addons-coupons': ProductsPlansPage,
   'customers': CustomersPage,
+  'subscriptions': DashboardPage,
+  'quotations-deals': DashboardPage,
   'invoices-receipts': InvoicesPage,
+  'payments-dunning': PaymentsDunningPage,
   'tax-ledgers': TaxLedgersPage,
-  'payments-dunning': TaxLedgersPage, // Unified accounting & dunning view
   'revenue-analytics': ChurnRetentionPage,
   'churn-retention': ChurnRetentionPage,
+  'webhooks-api': WebhooksApiPage,
   'organization-settings': OrganizationSettingsPage
 };
 
@@ -48,10 +56,15 @@ export class Router {
     // Update document title
     const titles = {
       dashboard: 'Executive Dashboard · Brightloop Billing Core',
+      'products-plans': 'Products & Plans Catalog · Brightloop',
+      'addons-coupons': 'Add-ons & Coupons CPQ · Brightloop',
       customers: 'Customer 360 & Lifecycle · Brightloop',
       'invoices-receipts': 'Invoices & Receipts Ledger · Brightloop',
+      'payments-dunning': 'Payments & Dunning Recovery · Brightloop',
       'tax-ledgers': 'Tax & General Ledgers · Brightloop',
+      'revenue-analytics': 'Revenue Analytics Telemetry · Brightloop',
       'churn-retention': 'Churn & Retention Telemetry · Brightloop',
+      'webhooks-api': 'Webhooks & Developer APIs · Brightloop',
       'organization-settings': 'Organization Settings & Governance · Brightloop'
     };
     document.title = titles[route] || 'Brightloop Enterprise Billing System';
@@ -80,4 +93,3 @@ export class Router {
     }
   }
 }
-
