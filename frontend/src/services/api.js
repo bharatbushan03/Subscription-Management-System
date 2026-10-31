@@ -101,6 +101,61 @@ export const subscriptionService = {
       method: 'POST',
       body: JSON.stringify(data)
     });
+  },
+
+  async getById(id) {
+    const res = await request(`/subscriptions/${id}`);
+    if (res && res.data) return res.data;
+    const list = await this.list();
+    return list.find(s => s.id === id) || list[0];
+  },
+
+  async activate(id, actor = 'Elena Vance') {
+    return await request(`/subscriptions/${id}/activate`, {
+      method: 'POST',
+      body: JSON.stringify({ actor })
+    });
+  },
+
+  async pause(id, reason = 'Customer request', actor = 'Marcus Vance') {
+    return await request(`/subscriptions/${id}/pause`, {
+      method: 'POST',
+      body: JSON.stringify({ reason, actor })
+    });
+  },
+
+  async resume(id, actor = 'Marcus Vance') {
+    return await request(`/subscriptions/${id}/resume`, {
+      method: 'POST',
+      body: JSON.stringify({ actor })
+    });
+  },
+
+  async renew(id, actor = 'Elena Vance') {
+    return await request(`/subscriptions/${id}/renew`, {
+      method: 'POST',
+      body: JSON.stringify({ actor })
+    });
+  },
+
+  async upgrade(id, upgradeData) {
+    return await request(`/subscriptions/${id}/upgrade`, {
+      method: 'POST',
+      body: JSON.stringify(upgradeData)
+    });
+  },
+
+  async cancel(id, cancelData = {}) {
+    return await request(`/subscriptions/${id}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify(cancelData)
+    });
+  },
+
+  async getTimeline(id) {
+    const res = await request(`/subscriptions/${id}/lifecycle`);
+    if (res && res.timeline) return res.timeline;
+    return [];
   }
 };
 

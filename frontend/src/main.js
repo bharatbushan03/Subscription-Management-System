@@ -7,6 +7,7 @@ import './styles/main.css';
 import { store } from './store/index.js';
 import { AppLayout } from './components/layout/AppLayout.js';
 import { Router } from './router.js';
+import { subscriptionService } from './services/api.js';
 
 class Application {
   constructor() {
@@ -73,6 +74,42 @@ class Application {
       // Sidebar collapse toggle
       if (e.target.closest('#sidebar-toggle-btn') || e.target.closest('#mobile-menu-btn')) {
         store.toggleSidebar();
+      }
+
+      // Subscription Lifecycle Actions
+      if (e.target.closest('#btn-sub-renew')) {
+        const btn = e.target.closest('#btn-sub-renew');
+        btn.disabled = true;
+        btn.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span> Renewing...`;
+        subscriptionService.renew('sub_4481_ent', 'Elena Vance').then(res => {
+          alert(res && res.message ? res.message : 'Subscription successfully renewed for 1 additional year!');
+          btn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check</span> Renewed!`;
+        }).catch(err => {
+          alert('Renewal triggered: ' + err.message);
+        });
+      }
+
+      if (e.target.closest('#btn-sub-pause')) {
+        const btn = e.target.closest('#btn-sub-pause');
+        const reason = prompt('Enter reason for pausing recurring billing:', 'Customer system maintenance');
+        if (reason) {
+          subscriptionService.pause('sub_4481_ent', reason).then(res => {
+            alert(res && res.message ? res.message : 'Subscription paused successfully.');
+            btn.innerHTML = `<span class="material-symbols-outlined text-[16px]">play_circle</span> Resume Billing`;
+          });
+        }
+      }
+
+      if (e.target.closest('#btn-sub-upgrade')) {
+        alert('Plan Upgrade: Selected Tier 3 Enterprise Infinite. Prorated delta charge calculated: $0.00.');
+      }
+
+      if (e.target.closest('#btn-sub-cancel')) {
+        if (confirm('Are you sure you want to cancel subscription sub_4481_ent? This will initiate churn protocol.')) {
+          subscriptionService.cancel('sub_4481_ent', { reason: 'CSM Escalation' }).then(res => {
+            alert(res && res.message ? res.message : 'Subscription cancellation processed.');
+          });
+        }
       }
     });
   }

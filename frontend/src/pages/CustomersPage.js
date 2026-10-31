@@ -194,6 +194,35 @@ export async function CustomersPage() {
               </div>
             </div>
 
+            <!-- Lifecycle Action Controls -->
+            <div class="p-3.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px]">sync_saved_locally</span>
+                <div class="flex flex-col">
+                  <span class="font-label-md font-semibold text-on-surface">Subscription Lifecycle Management</span>
+                  <span class="text-caption-mono text-[11px] text-secondary">Execute state machine transitions with proration & audit logging</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <button id="btn-sub-renew" class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md font-semibold transition-all shadow-sm flex items-center gap-1 text-[12px]">
+                  <span class="material-symbols-outlined text-[16px]">autorenew</span>
+                  <span>Renew (+1 Year)</span>
+                </button>
+                <button id="btn-sub-pause" class="px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md font-semibold transition-all shadow-sm border border-outline-variant/30 flex items-center gap-1 text-[12px]">
+                  <span class="material-symbols-outlined text-[16px]">pause_circle</span>
+                  <span>Pause Billing</span>
+                </button>
+                <button id="btn-sub-upgrade" class="px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md font-semibold transition-all shadow-sm border border-outline-variant/30 flex items-center gap-1 text-[12px]">
+                  <span class="material-symbols-outlined text-[16px]">upgrade</span>
+                  <span>Change Tier</span>
+                </button>
+                <button id="btn-sub-cancel" class="px-2.5 py-1.5 rounded-lg text-error hover:bg-error-container/40 font-label-md font-semibold transition-all text-[12px] flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">cancel</span>
+                  <span>Cancel</span>
+                </button>
+              </div>
+            </div>
+
             <div class="flex justify-between items-center pt-2 border-t border-surface-container/40">
               <a href="#" class="text-label-md text-primary font-semibold hover:underline">View Subscription Details (sub_4481_ent) &rarr;</a>
               <button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md font-semibold transition-colors">Modify Seats / Add-ons</button>
