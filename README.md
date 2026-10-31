@@ -239,3 +239,58 @@ npm install
 cp .env.example .env
 npm run dev
 ```
+
+
+### 3. Run the Modern Frontend Web Application
+```bash
+cd frontend
+npm install
+npm run dev     # Starts Vite dev server on http://localhost:3000
+npm run build   # Compiles production assets into dist/
+```
+
+### 4. Automated Multi-Tier Docker Deployment
+Deploy the full enterprise stack (PostgreSQL 16, Odoo 19, Node.js API Gateway, and Nginx SPA client) with one command:
+
+**Linux / macOS:**
+```bash
+./deploy.sh
+```
+
+**Windows PowerShell:**
+```powershell
+.\deploy.ps1
+```
+
+Or via standard Docker Compose:
+```bash
+docker compose up -d
+```
+
+---
+
+## 🧪 Comprehensive Automated Test Suite
+
+Run the master test runner to verify all tiers (Odoo static schema, Python compilation, Backend REST API, and Frontend SPA):
+
+```bash
+# Run complete test suite across all application tiers
+node ../test_complete_application.js
+
+# Or test individual modules:
+npm --prefix backend test     # Run 25 backend integration & lifecycle tests
+npm --prefix frontend test    # Run 19 frontend bundling & component tests
+python tests/test_odoo_module_static.py  # Run Odoo schema & rule tests
+```
+
+---
+
+## 📚 Complete Project Documentation
+
+Detailed technical and operational documentation is available in the `docs/` directory:
+
+- 🚀 **[Production Deployment Guide](docs/DEPLOYMENT_GUIDE.md):** Architecture topology, Docker orchestration, bare-metal service setup, SSL/TLS hardening, and disaster recovery.
+- 📡 **[REST API Specification](docs/API_DOCUMENTATION.md):** Full OpenAPI reference for subscriptions, lifecycles, analytics, customers, invoices, dunning, taxes, and RBAC governance.
+- 📖 **[User Manual & Operations Guide](docs/USER_MANUAL.md):** Operator walkthrough for Customer 360, plan tier modifications, smart dunning retries, and nexus monitoring.
+- 🎨 **[Design System Specification](docs/DESIGN.md):** Design tokens, typographic scales, and color system.
+- 💻 **[Frontend Architecture](docs/FRONTEND_ARCHITECTURE.md):** SPA state store, routing, component hierarchy, and API client design.

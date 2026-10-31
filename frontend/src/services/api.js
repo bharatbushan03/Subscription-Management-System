@@ -70,6 +70,12 @@ export const subscriptionService = {
   renew(id) {
     return this.action(id, 'renew');
   },
+  upgrade(id, data = {}) {
+    return fetchJson(/subscriptions//upgrade, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
   cancel(id) {
     return this.action(id, 'close');
   },

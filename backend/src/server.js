@@ -37,6 +37,10 @@ app.use('/api/tax', taxRoutes);
 app.use('/api/dunning', dunningRoutes);
 app.use('/api/organization', organizationRoutes);
 
-app.listen(PORT, () => {
+if (require.main === module) {
+  app.listen(PORT, () => {
   console.log(`🚀 Brightloop Billing API server running on port ${PORT}`);
 });
+}
+
+module.exports = app;
