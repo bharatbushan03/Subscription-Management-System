@@ -8,6 +8,7 @@
     'depends': [
         'sale_management',
         'account',
+        'mail',
         'portal',
         'auth_signup',
         'auth_password_policy',
@@ -19,6 +20,7 @@
         'security/record_rules.xml',
         'data/password_policy.xml',
         'data/subscription_sequence.xml',
+        'data/subscription_cron.xml',
         'views/subscription_plan_views.xml',
         'views/subscription_views.xml',
     ],

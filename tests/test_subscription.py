@@ -130,3 +130,60 @@ class TestSubscription(TransactionCase):
                 'partner_id': self.customer.partner_id.id,
                 'plan_id': self.plan.id,
             })
+
+    def test_lifecycle_transitions_and_billing_eligibility(self):
+        payment_term = self.env['account.payment.term'].search([], limit=1)
+        self.plan.write({'allow_pause': True, 'allow_early_closure': True})
+        subscription = self._subscription(payment_term_id=payment_term.id)
+        subscription.action_create_quotation()
+        self.assertEqual(subscription.state, 'quotation')
+        subscription.action_confirm()
+        self.assertEqual(subscription.state, 'confirmed')
+        subscription.action_activate()
+        self.assertEqual(subscription.state, 'active')
+        self.assertTrue(subscription.billing_eligible)
+        subscription.action_pause()
+        self.assertEqual(subscription.state, 'paused')
+        self.assertFalse(subscription.billing_eligible)
+        subscription.action_resume()
+        subscription.action_close()
+        self.assertEqual(subscription.state, 'closed')
+        self.assertFalse(subscription.billing_eligible)
+
+    def test_invalid_transitions_and_plan_permissions(self):
+        payment_term = self.env['account.payment.term'].search([], limit=1)
+        subscription = self._subscription(payment_term_id=payment_term.id)
+        with self.assertRaises(ValidationError):
+            subscription.action_activate()
+        subscription.action_create_quotation()
+        subscription.action_confirm()
+        subscription.action_activate()
+
+        self.plan.allow_pause = False
+        with self.assertRaises(ValidationError):
+            subscription.action_pause()
+        self.plan.allow_early_closure = False
+        with self.assertRaises(ValidationError):
+            subscription.action_close()
+
+    def test_automatic_expiry_and_renewal(self):
+        payment_term = self.env['account.payment.term'].search([], limit=1)
+        self.plan.write({
+            'automatic_closure': True,
+            'allow_renewal': True,
+        })
+        expired = self._subscription(
+            payment_term_id=payment_term.id,
+            start_date=date(2025, 1, 1),
+            expiry_date=date(2025, 12, 31),
+            next_invoice_date=date(2025, 2, 1),
+        )
+        expired.write({'state': 'active'})
+        closed = self.env['subscription.subscription'].cron_close_expired_subscriptions()
+        self.assertIn(expired, closed)
+        self.assertEqual(expired.state, 'closed')
+        renewed = expired.action_renew()
+        self.assertEqual(renewed.previous_subscription_id, expired)
+        self.assertEqual(expired.renewal_subscription_id, renewed)
+        with self.assertRaises(ValidationError):
+            expired.action_renew()

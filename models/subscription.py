@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
@@ -6,12 +8,18 @@ class Subscription(models.Model):
     _name = 'subscription.subscription'
     _description = 'Subscription'
     _order = 'start_date desc, id desc'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     _sql_constraints = [
         (
             'subscription_number_unique',
             'unique(subscription_number)',
             'Subscription number must be unique.',
+        ),
+        (
+            'subscription_renewal_unique',
+            'unique(previous_subscription_id)',
+            'A subscription can only be renewed once.',
         ),
     ]
 
@@ -59,10 +67,25 @@ class Subscription(models.Model):
         required=True,
         default='draft',
         index=True,
+        tracking=True,
     )
     quotation_id = fields.Many2one(
         'sale.order',
         string='Quotation',
+        ondelete='restrict',
+    )
+    previous_subscription_id = fields.Many2one(
+        'subscription.subscription',
+        string='Previous Subscription',
+        readonly=True,
+        copy=False,
+        ondelete='restrict',
+    )
+    renewal_subscription_id = fields.Many2one(
+        'subscription.subscription',
+        string='Renewal',
+        readonly=True,
+        copy=False,
         ondelete='restrict',
     )
     line_ids = fields.One2many(
@@ -100,6 +123,19 @@ class Subscription(models.Model):
         currency_field='currency_id',
         store=True,
     )
+    billing_eligible = fields.Boolean(
+        compute='_compute_billing_eligible',
+        help='Whether recurring billing may process this subscription.',
+    )
+
+    @api.depends('state', 'expiry_date')
+    def _compute_billing_eligible(self):
+        today = fields.Date.context_today(self)
+        for subscription in self:
+            subscription.billing_eligible = bool(
+                subscription.state == 'active'
+                and subscription.expiry_date >= today
+            )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -118,6 +154,7 @@ class Subscription(models.Model):
                 raise ValidationError(_("Subscription number must be unique."))
         subscriptions = super().create(vals_list)
         subscriptions._validate_subscription()
+        subscriptions._post_lifecycle_message(_("Subscription created."))
         return subscriptions
 
     def write(self, vals):
@@ -177,6 +214,145 @@ class Subscription(models.Model):
             for line in subscription.line_ids:
                 line._validate_subscription_line()
         return True
+
+    def _check_transition(self, allowed_states):
+        for subscription in self:
+            if subscription.state not in allowed_states:
+                raise ValidationError(
+                    _("Subscription '%s' cannot transition from %s.")
+                    % (subscription.display_name, subscription.state)
+                )
+        return True
+
+    def _post_lifecycle_message(self, message):
+        for subscription in self:
+            subscription.message_post(body=message)
+
+    def action_create_quotation(self):
+        self._check_transition(('draft',))
+        self._validate_subscription()
+        self.write({'state': 'quotation'})
+        self._post_lifecycle_message(_("Quotation prepared."))
+        return True
+
+    def action_confirm(self):
+        self._check_transition(('quotation',))
+        for subscription in self:
+            if not subscription.payment_term_id:
+                raise ValidationError(_("Payment terms are required before confirmation."))
+            subscription._validate_subscription()
+        self.write({'state': 'confirmed'})
+        self._post_lifecycle_message(_("Subscription confirmed."))
+        return True
+
+    def action_activate(self):
+        self._check_transition(('confirmed',))
+        today = fields.Date.context_today(self)
+        for subscription in self:
+            if subscription.start_date > today:
+                raise ValidationError(_("A subscription cannot be activated before its start date."))
+            if subscription.expiry_date < today:
+                raise ValidationError(_("An expired subscription cannot be activated."))
+            subscription._validate_subscription()
+        self.write({
+            'state': 'active',
+            'next_invoice_date': fields.Date.context_today(self),
+        })
+        self._post_lifecycle_message(_("Subscription activated."))
+        return True
+
+    def action_pause(self):
+        self._check_transition(('active',))
+        for subscription in self:
+            if not subscription.plan_id.can_pause():
+                raise ValidationError(_("This subscription plan does not allow pausing."))
+        self.write({'state': 'paused'})
+        self._post_lifecycle_message(_("Subscription paused."))
+        return True
+
+    def action_resume(self):
+        self._check_transition(('paused',))
+        today = fields.Date.context_today(self)
+        for subscription in self:
+            if subscription.expiry_date < today:
+                raise ValidationError(_("An expired subscription cannot be resumed."))
+        self.write({'state': 'active'})
+        self._post_lifecycle_message(_("Subscription resumed."))
+        return True
+
+    def action_close(self):
+        self._check_transition(('confirmed', 'active', 'paused'))
+        today = fields.Date.context_today(self)
+        for subscription in self:
+            if (
+                subscription.expiry_date > today
+                and not subscription.plan_id.can_close_early()
+            ):
+                raise ValidationError(
+                    _("This subscription plan does not allow early closure.")
+                )
+        self.write({'state': 'closed'})
+        self._post_lifecycle_message(_("Subscription closed."))
+        return True
+
+    def action_renew(self):
+        self._check_transition(('closed',))
+        today = fields.Date.context_today(self)
+        renewed = self.env['subscription.subscription']
+        for subscription in self:
+            if subscription.renewal_subscription_id:
+                raise ValidationError(_("This subscription has already been renewed."))
+            if not subscription.plan_id.can_renew():
+                raise ValidationError(_("This subscription plan does not allow renewal."))
+            start_date = max(
+                subscription.expiry_date + timedelta(days=1),
+                today,
+            )
+            next_date = subscription.plan_id.get_next_billing_date(start_date)
+            renewal = self.create({
+                'partner_id': subscription.partner_id.id,
+                'plan_id': subscription.plan_id.id,
+                'start_date': start_date,
+                'expiry_date': next_date - timedelta(days=1),
+                'next_invoice_date': start_date,
+                'payment_term_id': subscription.payment_term_id.id,
+                'currency_id': subscription.currency_id.id,
+                'previous_subscription_id': subscription.id,
+                'responsible_user_id': subscription.responsible_user_id.id,
+                'line_ids': [
+                    (0, 0, {
+                        'product_id': line.product_id.id,
+                        'quantity': line.quantity,
+                        'unit_price': line.unit_price,
+                        'tax_ids': [(6, 0, line.tax_ids.ids)],
+                        'discount': line.discount,
+                    })
+                    for line in subscription.line_ids
+                ],
+            })
+            subscription.write({'renewal_subscription_id': renewal.id})
+            subscription._post_lifecycle_message(
+                _("Renewal created: %s.") % renewal.display_name
+            )
+            renewal._post_lifecycle_message(
+                _("Renewed from %s.") % subscription.display_name
+            )
+            renewed |= renewal
+        return renewed
+
+    def _close_expired_subscriptions(self):
+        today = fields.Date.context_today(self)
+        subscriptions = self.search([
+            ('state', 'in', ('active', 'paused')),
+            ('expiry_date', '<=', today),
+        ]).filtered(lambda subscription: subscription.plan_id.automatic_closure)
+        if subscriptions:
+            subscriptions.action_close()
+        return subscriptions
+
+    @api.model
+    def cron_close_expired_subscriptions(self):
+        return self._close_expired_subscriptions()
 
 
 class SubscriptionLine(models.Model):
