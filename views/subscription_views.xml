@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_subscription_subscription_list" model="ir.ui.view">
+        <field name="name">subscription.subscription.list</field>
+        <field name="model">subscription.subscription</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="subscription_number"/>
+                <field name="partner_id"/>
+                <field name="plan_id"/>
+                <field name="start_date"/>
+                <field name="expiry_date"/>
+                <field name="next_invoice_date"/>
+                <field name="state"/>
+                <field name="amount_total"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_subscription_subscription_form" model="ir.ui.view">
+        <field name="name">subscription.subscription.form</field>
+        <field name="model">subscription.subscription</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="subscription_number"/>
+                        <h1><field name="subscription_number"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="plan_id"/>
+                            <field name="quotation_id"/>
+                            <field name="responsible_user_id"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="expiry_date"/>
+                            <field name="next_invoice_date"/>
+                            <field name="payment_term_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="discount"/>
+                                    <field name="tax_ids" widget="many2many_tags"/>
+                                    <field name="subtotal"/>
+                                    <field name="tax_amount"/>
+                                    <field name="total"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="amount_untaxed"/>
+                                <field name="amount_tax"/>
+                                <field name="amount_total"/>
+                            </group>
+                        </page>
+                        <page string="Invoices">
+                            <field name="invoice_ids"/>
+                        </page>
+                        <page string="Internal Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_subscription_subscription" model="ir.actions.act_window">
+        <field name="name">Subscriptions</field>
+        <field name="res_model">subscription.subscription</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_subscription_subscription" name="Subscriptions"
+              parent="sale.sale_menu_root" action="action_subscription_subscription"
+              groups="group_subscription_staff"/>
+</odoo>

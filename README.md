@@ -31,6 +31,26 @@ The backend methods `is_available`, `validate_quantity`,
 `can_close_early`, and `can_renew` are the frontend's permission and
 calculation contract. Invoice generation and subscription records are not part
 of this phase.
+
+## Subscription database contract
+
+The database phase adds `subscription.subscription` and `subscription.line`.
+Subscriptions use states `draft`, `quotation`, `confirmed`, `active`, `paused`,
+and `closed`. Subscription numbers are generated as `SUB/YYYY/00001`.
+
+The subscription contains `partner_id`, `plan_id`, `start_date`,
+`expiry_date`, `next_invoice_date`, `payment_term_id`, `currency_id`, `state`,
+`quotation_id`, `line_ids`, `invoice_ids`, `note`, `responsible_user_id`, and
+the computed `amount_untaxed`, `amount_tax`, and `amount_total` fields.
+Subscription lines contain `product_id`, `quantity`, `unit_price`, `tax_ids`,
+`discount`, `currency_id`, `subtotal`, `tax_amount`, and `total`.
+
+Subscription lines reuse `account.tax.compute_all`; no separate tax engine is
+introduced. A subscription must have at least one active plan product, dates
+must be ordered, currencies must match the plan, and line quantities/prices
+must be valid. Customers can only read subscriptions belonging to their
+commercial partner; staff can create and edit subscriptions, while
+administrators have full access.
 > **Brightloop Enterprise Billing & Subscription Management Platform**
 
 A production-grade, enterprise SaaS architecture designed for high-precision subscription lifecycle management, recurring revenue telemetry (MRR/ARR), plan tiering, and billing automation.
