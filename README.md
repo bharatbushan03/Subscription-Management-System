@@ -25,7 +25,7 @@ A production-grade, enterprise SaaS architecture designed for high-precision sub
 ### 6. Organization Settings & Access Governance
 ![Organization Settings & Access Governance](docs/screenshots/organization-settings-preview.jpg)
 
-The complete design specification and design token standards are documented in [docs/DESIGN.md](docs/DESIGN.md).
+The complete design specification and design token standards are documented in [docs/DESIGN.md](docs/DESIGN.md), and the SPA frontend engineering architecture is detailed in [docs/FRONTEND_ARCHITECTURE.md](docs/FRONTEND_ARCHITECTURE.md).
 
 ---
 
