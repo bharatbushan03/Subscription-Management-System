@@ -19,7 +19,7 @@ export async function DashboardPage() {
         <div>
           <div class="flex items-center gap-2 flex-wrap">
             <h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">Executive Telemetry & Revenue Operations</h1>
-            ${Badge({ text: 'Stripe & NetSuite ERP Synced', variant: 'success', dot: true })}
+            ${Badge({ text: 'Billing records synced', variant: 'success', dot: true })}
             <span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-caption-mono text-caption-mono text-[11px] font-semibold">ASC 606 Compliant</span>
           </div>
           <p class="font-body-md text-on-surface-variant max-w-4xl mt-1">
@@ -120,7 +120,7 @@ export async function DashboardPage() {
                 </div>
                 <div class="flex items-center gap-2 text-on-surface">
                   <span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
-                  <span>Standard Stripe Gateway Sync</span>
+                  <span>Standard payment gateway sync</span>
                 </div>
               </div>
             </div>

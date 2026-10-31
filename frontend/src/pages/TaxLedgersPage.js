@@ -70,7 +70,7 @@ export async function TaxLedgersPage() {
     {
       event: 'Subscription Renewal Charge',
       trigger: 'Trigger: Invoice Paid Event',
-      dr: '1100 - Cash / Stripe Clearing',
+      dr: '1100 - Cash / Payment Clearing',
       cr: '2200 - Deferred SaaS Revenue',
       netsuiteId: 'MAP-NS-1048',
       status: 'Verified Sync'
@@ -86,7 +86,7 @@ export async function TaxLedgersPage() {
     {
       event: 'Sales Tax Withheld / Charged',
       trigger: 'Trigger: AvaTax Committed Tax',
-      dr: '1100 - Cash / Stripe Clearing',
+      dr: '1100 - Cash / Payment Clearing',
       cr: '2150 - Sales Tax Payable (Avalara)',
       netsuiteId: 'MAP-NS-2150',
       status: 'Verified Sync'
@@ -95,7 +95,7 @@ export async function TaxLedgersPage() {
       event: 'Payment Processing Fees',
       trigger: 'Trigger: Settlement Payout Batch',
       dr: '6100 - Merchant Processing Fees',
-      cr: '1100 - Cash / Stripe Clearing',
+      cr: '1100 - Cash / Payment Clearing',
       netsuiteId: 'MAP-NS-6100',
       status: 'Verified Sync'
     },

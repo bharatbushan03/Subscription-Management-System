@@ -1,25 +1,33 @@
 /**
- * Odoo JSON API client.
+ * Supabase API client.
  *
- * Authentication is provided by the Odoo session cookie. The server remains
- * authoritative for permissions, validation, totals, and lifecycle actions.
+ * The server remains authoritative for permissions, validation, totals, and
+ * lifecycle actions.
  */
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+const TOKEN_KEY = 'subscription_management_token';
 
 async function fetchJson(endpoint, options = {}) {
+  const token = localStorage.getItem(TOKEN_KEY);
   const response = await fetch(`${API_BASE}${endpoint}`, {
-    credentials: 'same-origin',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers
     },
     ...options
   });
   const payload = await response.json().catch(() => ({}));
+  if (response.status === 401) {
+    localStorage.removeItem(TOKEN_KEY);
+    window.dispatchEvent(new CustomEvent('auth-expired'));
+  }
   if (!response.ok || payload.error) {
-    throw new Error(payload.error || `Odoo request failed (${response.status})`);
+    const error = new Error(payload.error || `API request failed (${response.status})`);
+    error.status = response.status;
+    throw error;
   }
   return payload.data;
 }
@@ -28,7 +36,7 @@ export const healthService = {
   check() {
     return identityService.current().then(() => ({
       status: 'ok',
-      service: 'Odoo'
+      service: 'Supabase'
     }));
   }
 };
@@ -36,6 +44,29 @@ export const healthService = {
 export const identityService = {
   current() {
     return fetchJson('/me');
+  }
+};
+
+export const authService = {
+  login(email, password) {
+    return fetchJson('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    }).then((payload) => {
+      localStorage.setItem(TOKEN_KEY, payload.token);
+      return payload.user;
+    });
+  },
+  register(name, email, password) {
+    return fetchJson('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password })
+    });
+  },
+  logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    window.location.hash = '';
+    window.location.reload();
   }
 };
 
@@ -91,12 +122,18 @@ export const customerService = {
       typeof params === 'string' ? { search: params } : params
     ).toString();
     return fetchJson(`/customers${query ? `?${query}` : ''}`);
+  },
+  create(data) {
+    return fetchJson('/customers', { method: 'POST', body: JSON.stringify(data) });
   }
 };
 
 export const planService = {
   list() {
     return fetchJson('/plans');
+  },
+  create(data) {
+    return fetchJson('/plans', { method: 'POST', body: JSON.stringify(data) });
   }
 };
 
@@ -135,10 +172,10 @@ export const quotationService = {
 
 export const taxService = {
   getNexus() {
-    return Promise.reject(new Error('Tax nexus reporting is not exposed by Odoo.'));
+    return Promise.reject(new Error('Tax nexus reporting is not configured.'));
   },
   getGLMappings() {
-    return Promise.reject(new Error('GL mappings are not exposed by Odoo.'));
+    return Promise.reject(new Error('GL mappings are not configured.'));
   }
 };
 

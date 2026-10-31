@@ -19,7 +19,7 @@ export async function InvoicesPage() {
           <div class="flex items-center gap-2 flex-wrap">
             <h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">Invoices & Receipts</h1>
             ${Badge({ text: 'Automated Billing Active', variant: 'success', dot: true })}
-            <span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-caption-mono text-caption-mono text-[11px] font-semibold">Stripe & NetSuite ERP Synced</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-caption-mono text-caption-mono text-[11px] font-semibold">Billing records synced</span>
           </div>
           <p class="font-body-md text-on-surface-variant max-w-4xl mt-1">
             Manage recurring customer invoices, automated collections, credit notes, payment receipts, and tax reconciliation across global billing entities.
@@ -126,7 +126,7 @@ export async function InvoicesPage() {
             </select>
             <select class="bg-surface-container-lowest text-on-surface font-label-md text-[12px] px-2.5 py-1.5 rounded-lg border border-outline-variant/30 shadow-sm focus:outline-none">
               <option>All Payment Methods</option>
-              <option>Credit Card (Stripe)</option>
+              <option>Credit Card</option>
               <option>ACH / Wire Transfer</option>
             </select>
           </div>

@@ -9,6 +9,9 @@ import { AppLayout } from './components/layout/AppLayout.js';
 import { Router } from './router.js';
 import { identityService } from './services/api.js';
 import { subscriptionService } from './services/api.js';
+import { LoginPage, bindLoginForm } from './pages/LoginPage.js';
+import { authService } from './services/api.js';
+import { customerService, planService } from './services/api.js';
 
 class Application {
   constructor() {
@@ -22,27 +25,34 @@ class Application {
       return;
     }
 
-    // 1. Render initial master layout
-    this.render();
-
-    // 2. Initialize client-side router
-    this.router = new Router('#page-content');
-    this.router.handleRoute();
     identityService.current().then((user) => {
       store.setState({ user });
+      this.renderApplication();
     }).catch((error) => {
-      console.error('[App] Unable to load Odoo session:', error);
+      if (error.status === 401) {
+        this.showLogin();
+      } else {
+        this.appMount.innerHTML = `<div class="p-8 text-error">Unable to connect to the API: ${error.message}</div>`;
+      }
     });
-
-    // 3. Register global keyboard listeners & interactions
-    this.setupEventListeners();
-
-    // 4. Subscribe to state changes
-    store.subscribe((state) => {
-      this.syncStateToDOM(state);
+    window.addEventListener('auth-expired', () => {
+      if (localStorage.getItem('subscription_management_token')) window.location.reload();
     });
 
     console.log('🚀 Brightloop Billing Core SPA Architecture Initialized.');
+  }
+
+  showLogin() {
+    this.appMount.innerHTML = LoginPage();
+    bindLoginForm(() => window.location.reload());
+  }
+
+  renderApplication() {
+    this.render();
+    this.router = new Router('#page-content');
+    this.router.handleRoute();
+    this.setupEventListeners();
+    store.subscribe((state) => this.syncStateToDOM(state));
   }
 
   render() {
@@ -65,6 +75,17 @@ class Application {
       // Search trigger click
       if (e.target.closest('#header-search-trigger')) {
         store.toggleCommandPalette(true);
+      }
+      if (e.target.closest('#logout-btn')) authService.logout();
+      if (e.target.closest('#add-customer-btn')) {
+        const name = prompt('Customer name:');
+        const email = name && prompt('Customer email:');
+        if (name && email) customerService.create({ name, email }).then(() => this.router.handleRoute()).catch((error) => alert(error.message));
+      }
+      if (e.target.closest('#add-plan-btn')) {
+        const name = prompt('Plan name:');
+        const price = name && prompt('Monthly price:');
+        if (name && price) planService.create({ name, recurring_price: Number(price), billing_frequency: 'monthly' }).then(() => this.router.handleRoute()).catch((error) => alert(error.message));
       }
 
       // Command palette backdrop click to close

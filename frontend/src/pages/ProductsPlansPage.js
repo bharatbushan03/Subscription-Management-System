@@ -28,7 +28,7 @@ export async function ProductsPlansPage() {
 
         <div class="flex items-center gap-2 flex-wrap shrink-0">
           ${Button({ label: 'Coupon & Discount Rules', icon: 'sell', variant: 'secondary' })}
-          ${Button({ label: '+ Add New Plan Tier', icon: 'add_circle', variant: 'primary' })}
+          <button id="add-plan-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary hover:bg-primary-container text-on-primary rounded-lg shadow-sm font-label-md font-semibold"><span class="material-symbols-outlined text-[18px]">add_circle</span>+ Add New Plan Tier</button>
         </div>
       </section>
 

@@ -82,8 +82,10 @@ export function Header({
           </div>
           <span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-on-surface transition-colors">expand_more</span>
         </a>
+        <button id="logout-btn" type="button" class="text-on-surface-variant hover:text-error p-2 rounded-lg" aria-label="Sign out">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+        </button>
       </div>
     </header>
   `;
 }
-

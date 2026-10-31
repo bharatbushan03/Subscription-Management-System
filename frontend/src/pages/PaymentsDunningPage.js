@@ -49,7 +49,7 @@ export async function PaymentsDunningPage() {
           <div class="flex items-center gap-2 flex-wrap">
             <h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">Payments Recovery & Dunning Cadence</h1>
             ${Badge({ text: 'ML Smart Retries Active', variant: 'success', dot: true })}
-            <span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-caption-mono text-caption-mono text-[11px] font-semibold">Stripe Account Updater Synced</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-caption-mono text-caption-mono text-[11px] font-semibold">Payment records synced</span>
           </div>
           <p class="font-body-md text-on-surface-variant max-w-4xl mt-1">
             Configure automated retry schedules, multi-channel dunning communication rules, card updater hooks, and involuntary churn mitigation playbooks.
@@ -156,4 +156,3 @@ export async function PaymentsDunningPage() {
     </div>
   `;
 }
-

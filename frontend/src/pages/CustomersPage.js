@@ -53,7 +53,7 @@ export async function CustomersPage() {
           <div class="flex items-center gap-2 flex-wrap shrink-0">
             ${Button({ label: 'Log Activity', icon: 'edit_note', variant: 'secondary' })}
             ${Button({ label: 'Send Statement', icon: 'mail', variant: 'secondary' })}
-            ${Button({ label: 'Create Subscription / Add-on', icon: 'add_circle', variant: 'primary' })}
+            <button id="add-customer-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary hover:bg-primary-container text-on-primary rounded-lg shadow-sm font-label-md font-semibold"><span class="material-symbols-outlined text-[18px]">add_circle</span>Add Customer</button>
           </div>
         </div>
 
@@ -298,7 +298,7 @@ export async function CustomersPage() {
                 <p class="font-body-sm text-[13px] text-on-surface">
                   <strong>Payment Retry Failed:</strong> Oct 27, 2024 · 04:12 AM UTC
                 </p>
-                <p class="text-caption-mono text-[12px] text-secondary">Stripe payment intent auto-retry #2 rejected: decline_code: 2004. Next attempt queued for Oct 30.</p>
+                <p class="text-caption-mono text-[12px] text-secondary">Payment retry #2 rejected. Next attempt queued for Oct 30.</p>
               </div>
 
               <div class="relative">
@@ -407,7 +407,7 @@ export async function CustomersPage() {
               <div class="flex justify-between"><span>Assigned CSM:</span><strong class="text-on-surface">Marcus Vance</strong></div>
               <div class="h-px bg-surface-container my-1"></div>
               <div class="flex justify-between items-center">
-                <span>Stripe Gateway</span>
+                <span>Payment Gateway</span>
                 ${Badge({ text: 'Connected', variant: 'success' })}
               </div>
               <div class="flex justify-between items-center">
