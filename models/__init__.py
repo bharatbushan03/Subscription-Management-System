@@ -6,3 +6,5 @@ from . import sale_order_line
 from . import sale_order
 from . import subscription_plan
 from . import subscription
+from . import subscription_discount
+from . import subscription_analytics

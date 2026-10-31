@@ -104,6 +104,29 @@ billing_period_end)`, plus row locking with `SKIP LOCKED`, prevents duplicate
 invoices when jobs overlap or retry. A failure is rolled back to its savepoint,
 logged with the subscription number and ID, and does not stop other
 subscriptions in the batch.
+
+## Phases 11-16 backend contract
+
+Invoices remain native `account.move` records. The addon adds
+`subscription_overdue`, billing-period fields, subscription navigation, and
+native payment-register actions; invoice posting, cancellation, email, PDF,
+payment reconciliation, and payment states remain Odoo Accounting behavior.
+
+Administrators manage `subscription.discount` rules. Supported fields include
+`discount_type` (`fixed` or `percentage`), `value`, validity dates, usage
+limits, product/plan scope, currency, and company. Applications are recorded
+in `subscription.discount.application`, uniquely per discount and invoice.
+Recurring billing applies one eligible rule per billing period, reserves usage
+under a database row lock, and rolls back both invoice and usage on failure.
+
+Customer portal routes are `/my/subscriptions`, `/my/subscription/<id>`,
+`/my/invoices`, `/my/invoice/<id>`, `/my/invoice/<id>/pdf`, `/my/payments`,
+and `/my/quotations`. Each route validates commercial-partner ownership on the
+server. Admin/Staff dashboard consumers can call
+`subscription.subscription.get_dashboard_kpis()`,
+`get_recurring_revenue_metrics()`, `get_revenue_report()`, and
+`get_plan_distribution()`; collected revenue uses paid native payments, while
+MRR normalizes daily, weekly, monthly, and yearly plan prices.
 > **Brightloop Enterprise Billing & Subscription Management Platform**
 
 A production-grade, enterprise SaaS architecture designed for high-precision subscription lifecycle management, recurring revenue telemetry (MRR/ARR), plan tiering, and billing automation.

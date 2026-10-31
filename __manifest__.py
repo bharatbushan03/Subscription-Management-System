@@ -24,6 +24,8 @@
         'views/subscription_plan_views.xml',
         'views/subscription_views.xml',
         'views/quotation_views.xml',
+        'views/subscription_discount_views.xml',
+        'views/portal_templates.xml',
     ],
     'installable': True,
     'application': True,

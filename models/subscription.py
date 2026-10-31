@@ -110,6 +110,11 @@ class Subscription(models.Model):
         string='Invoices',
         readonly=True,
     )
+    discount_application_ids = fields.One2many(
+        'subscription.discount.application',
+        'subscription_id',
+        readonly=True,
+    )
     note = fields.Text(string='Internal Notes')
     responsible_user_id = fields.Many2one(
         'res.users',
@@ -416,6 +421,33 @@ class Subscription(models.Model):
                 'discount': line.discount,
                 'tax_ids': [(6, 0, line.tax_ids.ids)],
             }))
+        discount = self.env['subscription.discount'].search([
+            ('active', '=', True),
+            '|', ('company_id', '=', self.env.company.id), ('company_id', '=', False),
+        ], order='id', limit=1)
+        if discount and not discount._is_eligible(self, self.line_ids, period_start):
+            discount = self.env['subscription.discount']
+        discount_amount = 0
+        if discount:
+            eligible_lines = self.line_ids
+            if discount.scope == 'products':
+                eligible_lines = eligible_lines.filtered(
+                    lambda line: line.product_id in discount.product_ids
+                )
+            discount_base = sum(eligible_lines.mapped('subtotal'))
+            if discount.discount_type == 'percentage':
+                discount_amount = discount_base * discount.value / 100
+                for values_line in invoice_lines:
+                    values_line[2]['discount'] = discount.value
+            else:
+                discount_amount = min(discount.value, discount_base)
+                account = invoice_lines[0][2]['account_id']
+                invoice_lines.append((0, 0, {
+                    'name': _('Discount: %s') % discount.name,
+                    'account_id': account,
+                    'quantity': 1,
+                    'price_unit': -discount_amount,
+                }))
         return {
             'move_type': 'out_invoice',
             'partner_id': self.partner_id.id,
@@ -433,6 +465,8 @@ class Subscription(models.Model):
             'billing_period_start': period_start,
             'billing_period_end': period_end,
             'invoice_line_ids': invoice_lines,
+            '_subscription_discount': discount,
+            '_subscription_discount_amount': discount_amount,
         }
 
     def _create_recurring_invoice(self):
@@ -453,11 +487,32 @@ class Subscription(models.Model):
         ], limit=1)
         if existing:
             return existing
+        values = self._prepare_recurring_invoice_values(period_start, period_end)
+        discount = values.pop('_subscription_discount', self.env['subscription.discount'])
+        discount_amount = values.pop('_subscription_discount_amount', 0)
         try:
             with self.env.cr.savepoint():
-                invoice = Move.create(
-                    self._prepare_recurring_invoice_values(period_start, period_end)
-                )
+                if discount and not discount._reserve_usage():
+                    discount = self.env['subscription.discount']
+                    discount_amount = 0
+                    values['invoice_line_ids'] = [
+                        line_values for line_values in values['invoice_line_ids']
+                        if not line_values[2].get('name', '').startswith('Discount: ')
+                    ]
+                    for line_values in values['invoice_line_ids']:
+                        line_values[2]['discount'] = 0
+                invoice = Move.create(values)
+                if discount:
+                    self.env['subscription.discount.application'].create({
+                        'discount_id': discount.id,
+                        'partner_id': self.partner_id.id,
+                        'subscription_id': self.id,
+                        'invoice_id': invoice.id,
+                        'amount': discount_amount,
+                        'billing_period_start': period_start,
+                        'billing_period_end': period_end,
+                        'currency_id': self.currency_id.id,
+                    })
                 next_invoice_date = self.plan_id.get_next_billing_date(period_start)
                 if next_invoice_date > self.expiry_date:
                     next_invoice_date = self.expiry_date
@@ -657,6 +712,11 @@ class AccountMove(models.Model):
         ondelete='restrict',
         index=True,
     )
+    discount_application_ids = fields.One2many(
+        'subscription.discount.application',
+        'invoice_id',
+        readonly=True,
+    )
     billing_period_start = fields.Date(
         string='Billing Period Start',
         copy=False,
@@ -667,6 +727,10 @@ class AccountMove(models.Model):
         copy=False,
         index=True,
     )
+    subscription_overdue = fields.Boolean(
+        compute='_compute_subscription_overdue',
+        search='_search_subscription_overdue',
+    )
 
     _sql_constraints = [
         (
@@ -675,3 +739,49 @@ class AccountMove(models.Model):
             'A subscription can only have one invoice for a billing period.',
         ),
     ]
+
+    @api.depends('state', 'payment_state', 'invoice_date_due', 'amount_residual')
+    def _compute_subscription_overdue(self):
+        today = fields.Date.context_today(self)
+        for invoice in self:
+            invoice.subscription_overdue = bool(
+                invoice.move_type in ('out_invoice', 'out_refund')
+                and invoice.state == 'posted'
+                and invoice.payment_state not in ('paid', 'reversed')
+                and invoice.amount_residual > 0
+                and invoice.invoice_date_due
+                and invoice.invoice_date_due < today
+            )
+
+    @api.model
+    def _search_subscription_overdue(self, operator, value):
+        if operator not in ('=', '!=') or not isinstance(value, bool):
+            raise ValidationError(_("Unsupported overdue search."))
+        today = fields.Date.context_today(self)
+        domain = [
+            ('move_type', 'in', ('out_invoice', 'out_refund')),
+            ('state', '=', 'posted'),
+            ('payment_state', 'not in', ('paid', 'reversed')),
+            ('amount_residual', '>', 0),
+            ('invoice_date_due', '<', today),
+        ]
+        if value == (operator == '='):
+            return domain
+        return [('id', 'not in', self.search(domain).ids)]
+
+    def action_open_subscription(self):
+        self.ensure_one()
+        if not self.subscription_id:
+            return False
+        return self.subscription_id._get_form_action()
+
+    def get_payment_register_action(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Register Payment'),
+            'res_model': 'account.payment.register',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'active_model': 'account.move', 'active_ids': self.ids},
+        }

@@ -4,3 +4,4 @@ from . import test_subscription_plan
 from . import test_subscription
 from . import test_quotation
 from . import test_billing
+from . import test_discount
