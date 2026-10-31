@@ -142,9 +142,18 @@ A production-grade, enterprise SaaS architecture designed for high-precision sub
 ![Customer Detail Overview](docs/screenshots/customer-detail-preview.jpg)
 
 ### 3. Invoices, Receipts & Global Tax Reconciliation Ledger
-![Invoices & Receipts Overview](docs/screenshots/invoices-receipts-preview.png)
+![Invoices & Receipts Overview](docs/screenshots/invoices-receipts-preview.jpg)
 
-The complete design specification and design token standards are documented in [docs/DESIGN.md](docs/DESIGN.md).
+### 4. Tax & General Ledgers / Payments & Dunning
+![Tax & General Ledgers Overview](docs/screenshots/tax-ledgers-preview.jpg)
+
+### 5. Churn & Retention Telemetry / Revenue Analytics
+![Churn & Retention Telemetry](docs/screenshots/churn-retention-preview.jpg)
+
+### 6. Organization Settings & Access Governance
+![Organization Settings & Access Governance](docs/screenshots/organization-settings-preview.jpg)
+
+The complete design specification and design token standards are documented in [docs/DESIGN.md](docs/DESIGN.md), and the SPA frontend engineering architecture is detailed in [docs/FRONTEND_ARCHITECTURE.md](docs/FRONTEND_ARCHITECTURE.md).
 
 ---
 
@@ -214,11 +223,14 @@ Subscription-Management-System/
 
 ## 🚀 Quick Start Guide
 
-### 1. View the Interactive Dashboard UI
-Open any interactive prototype directly in any modern browser:
+### 1. View the Interactive UI Prototypes
+Open any interactive prototype directly in any modern browser or via live server:
 - **Executive Dashboard:** [`code.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/code.html) or `frontend/public/index.html`
 - **Customer 360 Detail View:** [`customer-detail.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/customer-detail.html) or `frontend/public/customer-detail.html`
 - **Invoices & Receipts Ledger:** [`invoices-receipts.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/invoices-receipts.html) or `frontend/public/invoices-receipts.html`
+- **Tax & General Ledgers / Dunning:** [`tax-ledgers.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/tax-ledgers.html) or `frontend/public/tax-ledgers.html`
+- **Churn & Retention Telemetry:** [`churn-retention.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/churn-retention.html) or `frontend/public/churn-retention.html`
+- **Organization Settings & Governance:** [`organization-settings.html`](file:///c:/Users/offic/Desktop/Odoo/Subscription-Management-System/organization-settings.html) or `frontend/public/organization-settings.html`
 
 ### 2. Run the Backend API Service
 ```bash
@@ -227,22 +239,3 @@ npm install
 cp .env.example .env
 npm run dev
 ```
-
----
-
-## 🤝 Collaborator Workflow
-
-1. **Pull the latest main branch:**
-   ```bash
-   git pull origin main
-   ```
-2. **Create a dedicated feature branch:**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Commit your changes and push:**
-   ```bash
-   git add .
-   git commit -m "feat: implement feature"
-   git push -u origin feature/your-feature-name
-   ```
