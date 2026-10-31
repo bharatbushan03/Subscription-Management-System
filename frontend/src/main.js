@@ -7,6 +7,7 @@ import './styles/main.css';
 import { store } from './store/index.js';
 import { AppLayout } from './components/layout/AppLayout.js';
 import { Router } from './router.js';
+import { identityService } from './services/api.js';
 
 class Application {
   constructor() {
@@ -26,6 +27,11 @@ class Application {
     // 2. Initialize client-side router
     this.router = new Router('#page-content');
     this.router.handleRoute();
+    identityService.current().then((user) => {
+      store.setState({ user });
+    }).catch((error) => {
+      console.error('[App] Unable to load Odoo session:', error);
+    });
 
     // 3. Register global keyboard listeners & interactions
     this.setupEventListeners();

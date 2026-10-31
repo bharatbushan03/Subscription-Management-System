@@ -6,88 +6,10 @@
 import { MetricCard } from '../components/metrics/MetricCard.js';
 import { Badge } from '../components/common/Badge.js';
 import { Button } from '../components/common/Button.js';
+import { invoiceService } from '../services/api.js';
 
 export async function InvoicesPage() {
-  const invoices = [
-    {
-      id: 'INV-2024-8819',
-      hash: '9b2d-114c',
-      customer: 'OmniFlow Logistics',
-      account: 'CUST-4481',
-      plan: 'Enterprise Custom (Annual)',
-      date: 'Oct 24, 2024 – Oct 24, 2025',
-      amount: '$24,500.00',
-      subtotal: '$22,685.19',
-      tax: '$1,814.81',
-      status: 'past_due',
-      method: 'AMEX •••• 1009'
-    },
-    {
-      id: 'INV-2024-8818',
-      hash: 'f4e8-89aa',
-      customer: 'HyperScale Technologies',
-      account: 'CUST-1049',
-      plan: 'Dedicated Cloud Shard x3 (Monthly)',
-      date: 'Oct 22, 2024 – Nov 22, 2024',
-      amount: '$4,000.00',
-      subtotal: '$3,703.70',
-      tax: '$296.30',
-      status: 'paid',
-      method: 'AMEX •••• 1009'
-    },
-    {
-      id: 'INV-2024-8817',
-      hash: 'c701-44bb',
-      customer: 'CloudScale Systems',
-      account: 'CUST-9214',
-      plan: 'Scale Enterprise + Extra API',
-      date: 'Oct 20, 2024 – Oct 20, 2025',
-      amount: '$36,250.00',
-      subtotal: '$33,564.81',
-      tax: '$2,685.19',
-      status: 'paid',
-      method: 'AMEX •••• 1009'
-    },
-    {
-      id: 'INV-2024-8816',
-      hash: '110f-28ee',
-      customer: 'Apex Media Group',
-      account: 'CUST-8821',
-      plan: 'Growth Pro Annual License',
-      date: 'Oct 18, 2024 – Oct 18, 2025',
-      amount: '$11,247.18',
-      subtotal: '$10,414.06',
-      tax: '$833.12',
-      status: 'paid',
-      method: 'AMEX •••• 1009'
-    },
-    {
-      id: 'INV-2024-8815',
-      hash: '78aa-0041',
-      customer: 'Vanguard AI Labs',
-      account: 'CUST-3310',
-      plan: 'Metered LLM Ingestion True-Up',
-      date: 'Oct 15, 2024 – Nov 15, 2024',
-      amount: '$15,799.00',
-      subtotal: 'Base: $799.00',
-      tax: 'Usage: $15,000.00',
-      status: 'pending',
-      method: 'Wire Transfer / ACH'
-    },
-    {
-      id: 'CR-2024-0104',
-      hash: 'Credit Memo',
-      customer: 'Synthetix Health',
-      account: 'CUST-7712',
-      plan: 'Prorated Seat Downgrade Adjustment',
-      date: 'Oct 12, 2024',
-      amount: '-$1,200.00',
-      subtotal: 'Applied to Ledger',
-      tax: '$0.00',
-      status: 'credit',
-      method: 'Account Balance'
-    }
-  ];
+  const invoices = await invoiceService.list();
 
   return `
     <div class="flex flex-col w-full pb-12 animate-fade-in">
