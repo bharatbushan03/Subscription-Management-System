@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test test/frontend.test.js"
   },
   "keywords": [
     "saas",
@@ -20,4 +21,3 @@
     "vite": "^5.2.0"
   }
 }
-
