@@ -111,22 +111,3 @@ npm install
 cp .env.example .env
 npm run dev
 ```
-
----
-
-## 🤝 Collaborator Workflow
-
-1. **Pull the latest main branch:**
-   ```bash
-   git pull origin main
-   ```
-2. **Create a dedicated feature branch:**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Commit your changes and push:**
-   ```bash
-   git add .
-   git commit -m "feat: implement feature"
-   git push -u origin feature/your-feature-name
-   ```
