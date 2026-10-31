@@ -1,2 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_res_partner_subscription_staff,res.partner.subscription.staff,base.model_res_partner,group_subscription_staff,1,1,1,0
+access_subscription_plan_admin,subscription.plan.admin,model_subscription_plan,group_subscription_admin,1,1,1,1
+access_subscription_plan_staff,subscription.plan.staff,model_subscription_plan,group_subscription_staff,1,0,0,0
+access_subscription_plan_customer,subscription.plan.customer,model_subscription_plan,group_subscription_customer,1,0,0,0
+access_subscription_plan_line_admin,subscription.plan.line.admin,model_subscription_plan_line,group_subscription_admin,1,1,1,1
+access_subscription_plan_line_staff,subscription.plan.line.staff,model_subscription_plan_line,group_subscription_staff,1,0,0,0
+access_subscription_plan_line_customer,subscription.plan.line.customer,model_subscription_plan_line,group_subscription_customer,1,0,0,0

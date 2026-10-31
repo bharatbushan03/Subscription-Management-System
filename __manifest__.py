@@ -18,6 +18,7 @@
         'security/ir.model.access.csv',
         'security/record_rules.xml',
         'data/password_policy.xml',
+        'views/subscription_plan_views.xml',
     ],
     'installable': True,
     'application': True,

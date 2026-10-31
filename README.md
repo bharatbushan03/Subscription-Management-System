@@ -1,4 +1,36 @@
-# Subscription-Management-System
+# Subscription Management
+
+## Subscription plan frontend contract
+
+The plan-management phase exposes these Odoo models:
+
+- `subscription.plan`: `name` (char), `description` (text),
+  `recurring_price` (monetary), `currency_id` (many2one `res.currency`),
+  `billing_frequency` (selection), `minimum_quantity` (float),
+  `available_from`/`available_until` (date), `automatic_closure`,
+  `allow_early_closure`, `allow_pause`, `allow_renewal`, and `active` (boolean),
+  and `line_ids` (one2many `subscription.plan.line`).
+- `subscription.plan.line`: `plan_id` (many2one), `product_tmpl_id` (product
+  reference), `product_id` (optional product variant), `minimum_quantity`
+  (float), `unit_price` (monetary), `currency_id` (related currency),
+  `tax_ids` (many2many `account.tax`), and `active` (boolean).
+
+Use the exact billing-frequency values `daily`, `weekly`, `monthly`, and
+`yearly`. Next billing dates use calendar arithmetic, so month ends and leap
+days are preserved correctly.
+
+Available actions are plan create, edit, activate, and archive for
+`group_subscription_admin`. Staff can read available plans and use them on a
+quotation line through `sale.order.line.subscription_plan_id`. Customers can
+read only active plans within their availability dates. New quotation lines
+must use an available plan, an active product line, and a quantity at least
+the plan minimum. Expired and inactive plans are rejected.
+
+The backend methods `is_available`, `validate_quantity`,
+`get_next_billing_date`, `automatic_closure_applies`, `can_pause`,
+`can_close_early`, and `can_renew` are the frontend's permission and
+calculation contract. Invoice generation and subscription records are not part
+of this phase.
 > **Brightloop Enterprise Billing & Subscription Management Platform**
 
 A production-grade, enterprise SaaS architecture designed for high-precision subscription lifecycle management, recurring revenue telemetry (MRR/ARR), plan tiering, and billing automation.
