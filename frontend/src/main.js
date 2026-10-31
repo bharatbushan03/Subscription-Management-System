@@ -1,14 +1,16 @@
 /**
  * Main Application Bootstrap & Lifecycle Manager
  * Brightloop Enterprise Subscription & Billing System
+ * Phase 2: Fully connected with JWT auth and real API
  */
 
 import './styles/main.css';
 import { store } from './store/index.js';
 import { AppLayout } from './components/layout/AppLayout.js';
 import { Router } from './router.js';
-import { identityService } from './services/api.js';
-import { subscriptionService } from './services/api.js';
+import { authService, subscriptionService, tokenStorage } from './services/api.js';
+import { LoginPage, initLoginPage } from './pages/LoginPage.js';
+import { toast, confirmDialog, promptDialog } from './components/common/Toast.js';
 
 class Application {
   constructor() {
@@ -22,35 +24,56 @@ class Application {
       return;
     }
 
-    // 1. Render initial master layout
+    // Check auth state first
+    if (!authService.isLoggedIn()) {
+      this.renderLogin();
+      return;
+    }
+
+    // Load stored user into store
+    const storedUser = tokenStorage.getUser();
+    if (storedUser) {
+      store.setState({ user: storedUser });
+    }
+
+    // 1. Render master layout
     this.render();
 
-    // 2. Initialize client-side router
+    // 2. Initialize router
     this.router = new Router('#page-content');
     this.router.handleRoute();
-    identityService.current().then((user) => {
-      store.setState({ user });
-    }).catch((error) => {
-      console.error('[App] Unable to load Odoo session:', error);
-    });
 
-    // 3. Register global keyboard listeners & interactions
+    // 3. Register global interactions
     this.setupEventListeners();
 
     // 4. Subscribe to state changes
-    store.subscribe((state) => {
-      this.syncStateToDOM(state);
-    });
+    store.subscribe((state) => this.syncStateToDOM(state));
 
-    console.log('🚀 Brightloop Billing Core SPA Architecture Initialized.');
+    // 5. Update user display in header
+    this.updateUserDisplay();
+
+    console.log('✅ Brightloop Billing Core SPA initialized.');
+  }
+
+  renderLogin() {
+    this.appMount.innerHTML = LoginPage();
+    initLoginPage();
   }
 
   render() {
     this.appMount.innerHTML = AppLayout({ contentHtml: '' });
   }
 
+  updateUserDisplay() {
+    const user = store.getState().user;
+    const nameEl = document.querySelector('#header-user-name');
+    const roleEl = document.querySelector('#header-user-role');
+    if (nameEl) nameEl.textContent = user?.name || 'User';
+    if (roleEl) roleEl.textContent = user?.role || '';
+  }
+
   setupEventListeners() {
-    // Global Cmd+K / Ctrl+K keyboard shortcut
+    // Global Cmd+K shortcut
     window.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -60,78 +83,185 @@ class Application {
       }
     });
 
-    // Delegation on app mount for dynamic elements
-    this.appMount.addEventListener('click', (e) => {
-      // Search trigger click
+    // Delegated click handler on app mount
+    this.appMount.addEventListener('click', async (e) => {
+
+      // Command palette open
       if (e.target.closest('#header-search-trigger')) {
         store.toggleCommandPalette(true);
       }
 
-      // Command palette backdrop click to close
+      // Command palette close on backdrop
       if (e.target.id === 'command-palette-backdrop') {
         store.toggleCommandPalette(false);
       }
-
-      // Close when clicking an item inside command palette
       if (e.target.closest('#command-palette-backdrop a')) {
         store.toggleCommandPalette(false);
       }
 
-      // Sidebar collapse toggle
+      // Sidebar toggle
       if (e.target.closest('#sidebar-toggle-btn') || e.target.closest('#mobile-menu-btn')) {
         store.toggleSidebar();
       }
 
-      // Subscription Lifecycle Actions
-      if (e.target.closest('#btn-sub-renew')) {
-        const btn = e.target.closest('#btn-sub-renew');
-        btn.disabled = true;
-        btn.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span> Renewing...`;
-        subscriptionService.renew('sub_4481_ent', 'Elena Vance').then(res => {
-          alert(res && res.message ? res.message : 'Subscription successfully renewed for 1 additional year!');
-          btn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check</span> Renewed!`;
-        }).catch(err => {
-          alert('Renewal triggered: ' + err.message);
+      // ─── Logout ───────────────────────────────────────────────────────────
+      if (e.target.closest('[data-action="logout"]')) {
+        const confirmed = await confirmDialog({
+          title: 'Sign Out',
+          message: 'Are you sure you want to sign out of Brightloop?',
+          confirmText: 'Sign Out',
+          cancelText: 'Stay'
         });
-      }
-
-      if (e.target.closest('#btn-sub-pause')) {
-        const btn = e.target.closest('#btn-sub-pause');
-        const reason = prompt('Enter reason for pausing recurring billing:', 'Customer system maintenance');
-        if (reason) {
-          subscriptionService.pause('sub_4481_ent', reason).then(res => {
-            alert(res && res.message ? res.message : 'Subscription paused successfully.');
-            btn.innerHTML = `<span class="material-symbols-outlined text-[16px]">play_circle</span> Resume Billing`;
-          });
+        if (confirmed) {
+          await authService.logout();
+          window.location.reload();
         }
+        return;
       }
 
-      if (e.target.closest('#btn-sub-upgrade')) {
-        alert('Plan Upgrade: Selected Tier 3 Enterprise Infinite. Prorated delta charge calculated: $0.00.');
-      }
+      // ─── Subscription Lifecycle Actions ──────────────────────────────────
 
-      if (e.target.closest('#btn-sub-cancel')) {
-        if (confirm('Are you sure you want to cancel subscription sub_4481_ent? This will initiate churn protocol.')) {
-          subscriptionService.cancel('sub_4481_ent', { reason: 'CSM Escalation' }).then(res => {
-            alert(res && res.message ? res.message : 'Subscription cancellation processed.');
-          });
+      // Activate
+      const activateBtn = e.target.closest('[data-action="activate-sub"]');
+      if (activateBtn) {
+        const subId = activateBtn.dataset.id;
+        const confirmed = await confirmDialog({
+          title: 'Activate Subscription',
+          message: `Activate subscription ${subId}? Billing and entitlement quotas will go live immediately.`,
+          confirmText: 'Activate'
+        });
+        if (!confirmed) return;
+        try {
+          activateBtn.disabled = true;
+          await subscriptionService.activate(subId, store.getState().user?.name);
+          toast.success('Subscription activated successfully.');
+          this.router?.handleRoute();
+        } catch (err) {
+          toast.error(err.message);
         }
+        return;
+      }
+
+      // Pause
+      const pauseBtn = e.target.closest('[data-action="pause-sub"]');
+      if (pauseBtn) {
+        const subId = pauseBtn.dataset.id;
+        const reason = await promptDialog({
+          title: 'Pause Subscription',
+          message: 'Enter the reason for pausing recurring billing:',
+          placeholder: 'e.g. Customer system maintenance',
+          defaultValue: 'Customer requested pause'
+        });
+        if (!reason) return;
+        try {
+          pauseBtn.disabled = true;
+          await subscriptionService.pause(subId, reason, store.getState().user?.name);
+          toast.success('Subscription paused. Recurring billing suspended.');
+          this.router?.handleRoute();
+        } catch (err) {
+          toast.error(err.message);
+        }
+        return;
+      }
+
+      // Resume
+      const resumeBtn = e.target.closest('[data-action="resume-sub"]');
+      if (resumeBtn) {
+        const subId = resumeBtn.dataset.id;
+        const confirmed = await confirmDialog({
+          title: 'Resume Subscription',
+          message: 'Resume billing for this subscription? Recurring invoicing will restart.',
+          confirmText: 'Resume Billing'
+        });
+        if (!confirmed) return;
+        try {
+          resumeBtn.disabled = true;
+          await subscriptionService.resume(subId, store.getState().user?.name);
+          toast.success('Subscription resumed. Billing re-aligned.');
+          this.router?.handleRoute();
+        } catch (err) {
+          toast.error(err.message);
+        }
+        return;
+      }
+
+      // Renew
+      const renewBtn = e.target.closest('[data-action="renew-sub"]');
+      if (renewBtn) {
+        const subId = renewBtn.dataset.id;
+        const confirmed = await confirmDialog({
+          title: 'Renew Subscription',
+          message: 'Create a new renewal term? The current subscription will be closed and a new one will be created.',
+          confirmText: 'Renew Now'
+        });
+        if (!confirmed) return;
+        try {
+          renewBtn.disabled = true;
+          renewBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span> Renewing...';
+          const result = await subscriptionService.renew(subId, store.getState().user?.name);
+          toast.success(`Subscription renewed into ${result.data?.renewedSubscription?.sub_number || 'new term'}.`);
+          this.router?.handleRoute();
+        } catch (err) {
+          toast.error(err.message);
+        }
+        return;
+      }
+
+      // Cancel
+      const cancelBtn = e.target.closest('[data-action="cancel-sub"]');
+      if (cancelBtn) {
+        const subId = cancelBtn.dataset.id;
+        const confirmed = await confirmDialog({
+          title: 'Cancel Subscription',
+          message: 'Are you sure? This will permanently cancel the subscription and revoke all entitlements.',
+          confirmText: 'Cancel Subscription',
+          danger: true
+        });
+        if (!confirmed) return;
+        const reason = await promptDialog({
+          title: 'Cancellation Reason',
+          message: 'Please provide a reason for cancellation:',
+          placeholder: 'e.g. Voluntary cancellation, budget reduction'
+        });
+        try {
+          cancelBtn.disabled = true;
+          await subscriptionService.cancel(subId, { reason: reason || 'Unspecified', cancelAtPeriodEnd: false });
+          toast.success('Subscription cancelled.');
+          this.router?.handleRoute();
+        } catch (err) {
+          toast.error(err.message);
+        }
+        return;
+      }
+
+      // ─── Dunning retry ───────────────────────────────────────────────────
+      const retryBtn = e.target.closest('[data-action="retry-payment"]');
+      if (retryBtn) {
+        const invoiceId = retryBtn.dataset.id;
+        const { dunningService } = await import('./services/api.js');
+        try {
+          retryBtn.disabled = true;
+          await dunningService.retry(invoiceId);
+          toast.info(`Payment retry queued for invoice ${invoiceId}.`);
+        } catch (err) {
+          toast.error(err.message);
+        }
+        return;
       }
     });
   }
 
   syncStateToDOM(state) {
-    // Sync Command Palette DOM visibility
+    // Command Palette
     const paletteBackdrop = document.querySelector('#command-palette-backdrop');
     if (state.isCommandPaletteOpen && !paletteBackdrop) {
-      // Re-render layout or append palette
       this.render();
-      this.router.handleRoute();
+      this.router?.handleRoute();
     } else if (!state.isCommandPaletteOpen && paletteBackdrop) {
       paletteBackdrop.remove();
     }
 
-    // Sync active nav item in sidebar
+    // Active nav item
     document.querySelectorAll('[data-nav-path]').forEach(el => {
       const path = el.getAttribute('data-nav-path');
       const isActive = path === state.currentRoute || (path === 'dashboard' && state.currentRoute === '');
