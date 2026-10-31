@@ -128,14 +128,20 @@ when Render prompts for them.
    - Output directory: `dist`
    - Install command: `npm install`
 5. Deploy once.
-6. Update [`frontend/vercel.json`](frontend/vercel.json) and replace both
-   `subscription-management-api.onrender.com` values with your actual Render
-   hostname if it is different.
-7. Commit and push that change, then redeploy Vercel.
+6. In Vercel Project Settings > **Environment Variables**, add:
+
+   | Name | Value |
+   | --- | --- |
+   | `VITE_API_BASE_URL` | `https://YOUR-RENDER-SERVICE.onrender.com/api` |
+
+   Add it for the Production environment. Do not add the service-role key or
+   JWT secret to Vercel.
+7. Redeploy Vercel so Vite embeds the API URL in the production build.
 8. Set Render's `CLIENT_URL` to the final Vercel URL and redeploy Render.
 
-The frontend does not need Supabase variables in Vercel. Its `/api/*` and
-`/health` requests are proxied by `vercel.json` to Render.
+The frontend does not need Supabase variables in Vercel. Its API base URL is
+provided through `VITE_API_BASE_URL`. For local development, keep
+`VITE_API_BASE_URL=/api` so Vite proxies requests to the local backend.
 
 ## Authentication
 
