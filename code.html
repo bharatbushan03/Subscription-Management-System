@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"error-container":"#ffdad6","error":"#ba1a1a","on-primary-fixed-variant":"#003ea8","tertiary-fixed-dim":"#4edea3","on-primary-container":"#eeefff","surface-container-low":"#eff4ff","on-secondary-fixed-variant":"#3f465c","background":"#f8f9ff","tertiary":"#006242","surface-bright":"#f8f9ff","on-secondary-fixed":"#131b2e","on-background":"#0b1c30","on-surface-variant":"#434655","outline-variant":"#c3c6d7","on-surface":"#0b1c30","inverse-on-surface":"#eaf1ff","tertiary-fixed":"#6ffbbe","on-error":"#ffffff","surface-variant":"#d3e4fe","primary-container":"#2563eb","surface-tint":"#0053db","surface":"#f8f9ff","on-primary-fixed":"#00174b","surface-container-lowest":"#ffffff","primary":"#004ac6","inverse-surface":"#213145","surface-dim":"#cbdbf5","on-tertiary":"#ffffff","on-tertiary-container":"#bdffdb","secondary-container":"#dae2fd","on-tertiary-fixed-variant":"#005236","on-primary":"#ffffff","on-tertiary-fixed":"#002113","surface-container-highest":"#d3e4fe","on-secondary":"#ffffff","secondary-fixed-dim":"#bec6e0","on-error-container":"#93000a","outline":"#737686","primary-fixed-dim":"#b4c5ff","secondary":"#565e74","secondary-fixed":"#dae2fd","tertiary-container":"#007d55","on-secondary-container":"#5c647a","primary-fixed":"#dbe1ff","inverse-primary":"#b4c5ff","surface-container":"#e5eeff","surface-container-high":"#dce9ff"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"margin":"2rem","gutter-mobile":"0.75rem","space-md":"1rem","space-xl":"2rem","margin-mobile":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","space-lg":"1.5rem","gutter":"1.5rem"},"fontFamily":{"label-md":["Inter"],"body-lg":["Inter"],"headline-md":["Inter"],"body-md":["Inter"],"headline-sm":["Inter"],"label-sm":["Inter"],"display":["Inter"],"body-sm":["Inter"],"caption-mono":["Inter"],"headline-lg":["Inter"],"headline-lg-mobile":["Inter"]},"fontSize":{"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"500"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"headline-sm":["18px",{"lineHeight":"26px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.025em","fontWeight":"600"}],"display":["36px",{"lineHeight":"44px","letterSpacing":"-0.025em","fontWeight":"700"}],"body-sm":["13px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"caption-mono":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between select-none"><div class="flex flex-col h-full"><div class="h-16 px-space-md flex items-center justify-between bg-surface-container-lowest"><div class="flex items-center gap-space-sm min-w-0"><img alt="Brightloop Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WMyxc0NHxkyj9Cc8SAIuc4S52jbrmHWHfHtksfJmbwzgwjxwGq1cz9dvU1cvXEueYY8RuwmTx0r6hEccTWSCeLBR2yWfvYbIzpZU7-YuPCkSCH8QQMerywUBk4mJaKTRja5X3_-Jh3APv_0SZjHazBWl2o6GgmDxu5K7wAG4UGp0xWIdJ2ani8zPvC3glNTHUZDa76xUkWn4E7b6tam-JpuCMqmqfwH3m_iWPwU0Af-A"/><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-on-surface truncate tracking-tight">Brightloop</span><span class="font-label-sm text-label-sm text-primary uppercase tracking-wider font-semibold">Billing Core</span></div></div><button aria-label="Collapse sidebar" class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container p-space-xs rounded-lg transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dock_to_left</span></button></div><div class="px-space-md py-space-xs"><div class="flex items-center justify-between px-space-sm py-space-xs bg-surface-container-low rounded-lg cursor-pointer hover:bg-surface-container transition-colors"><div class="flex items-center gap-space-xs min-w-0"><span class="material-symbols-outlined text-[18px] text-primary">cloud_done</span><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-surface font-semibold truncate">Brightloop Cloud</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Production US-East</span></div></div><span class="material-symbols-outlined text-[16px] text-on-surface-variant">unfold_more</span></div></div><div class="flex-1 overflow-y-auto px-space-sm py-space-sm"><nav class="flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg shadow-sm"><div class="px-space-sm pt-space-xs pb-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Overview</span></div><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span class="font-body-md text-body-md">Dashboard</span></a><div class="px-space-sm pt-space-md pb-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Catalog &amp; Pricing</span></div><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="products-plans" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span class="font-body-md text-body-md">Products &amp; Plans</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="addons-coupons" href="#"><span class="material-symbols-outlined text-[20px]">sell</span><span class="font-body-md text-body-md">Add-ons &amp; Coupons</span></a><div class="px-space-sm pt-space-md pb-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Lifecycle</span></div><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="customers" href="#"><span class="material-symbols-outlined text-[20px]">group</span><span class="font-body-md text-body-md">Customers</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg bg-primary-container text-on-primary-container font-semibold shadow-sm transition-all" data-path="subscriptions" href="#"><span class="material-symbols-outlined text-[20px]">autorenew</span><span class="font-body-md text-body-md">Subscriptions</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="quotations-deals" href="#"><span class="material-symbols-outlined text-[20px]">request_quote</span><span class="font-body-md text-body-md">Quotations &amp; Deals</span></a><div class="px-space-sm pt-space-md pb-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Billing &amp; Finance</span></div><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="invoices-receipts" href="#"><span class="material-symbols-outlined text-[20px]">receipt_long</span><span class="font-body-md text-body-md">Invoices &amp; Receipts</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="payments-dunning" href="#"><span class="material-symbols-outlined text-[20px]">account_balance_wallet</span><span class="font-body-md text-body-md">Payments &amp; Dunning</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="tax-ledgers" href="#"><span class="material-symbols-outlined text-[20px]">menu_book</span><span class="font-body-md text-body-md">Tax &amp; Ledgers</span></a><div class="px-space-sm pt-space-md pb-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Intelligence</span></div><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="revenue-analytics" href="#"><span class="material-symbols-outlined text-[20px]">query_stats</span><span class="font-body-md text-body-md">Revenue Analytics</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="churn-retention" href="#"><span class="material-symbols-outlined text-[20px]">stacked_line_chart</span><span class="font-body-md text-body-md">Churn &amp; Retention</span></a><div class="px-space-sm pt-space-md pb-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Settings &amp; Dev</span></div><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="webhooks-api" href="#"><span class="material-symbols-outlined text-[20px]">terminal</span><span class="font-body-md text-body-md">Webhooks &amp; API</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="organization-settings" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span class="font-body-md text-body-md">Organization Settings</span></a></nav></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md min-w-0"><button aria-label="Toggle menu" class="text-on-surface-variant hover:text-on-surface p-space-xs rounded-lg hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">menu</span></button><nav aria-label="Breadcrumbs" class="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md"><span class="hover:text-on-surface cursor-pointer">Brightloop</span><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="hover:text-on-surface cursor-pointer">Admin Dashboard</span><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="text-on-surface font-semibold">Overview</span></nav></div><div class="flex-1 max-w-lg mx-space-lg hidden md:block"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-3 text-[18px] text-on-surface-variant">search</span><input class="w-full bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm rounded-lg pl-10 pr-12 py-2 focus:outline-none focus:bg-surface-container focus:ring-1 focus:ring-primary transition-all" placeholder="Search subscriptions, invoices, customers (Cmd+K)..." type="text"/><span class="absolute right-3 px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-caption-mono text-caption-mono">⌘K</span></div></div><div class="flex items-center gap-space-sm"><div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm font-semibold"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>Live Mode</div><button aria-label="Documentation" class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container p-2 rounded-lg transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">help_outline</span></button><div class="relative"><button aria-label="Notifications" class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container p-2 rounded-lg transition-colors relative" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-error text-on-error font-label-sm text-[10px] leading-tight flex items-center justify-center font-bold">3</span></button></div><button class="hidden sm:flex items-center gap-space-xs bg-primary hover:bg-primary-container text-on-primary px-space-sm py-2 rounded-lg font-label-md text-label-md font-semibold transition-colors shadow-sm" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span class="">Create Subscription</span></button><div class="h-6 w-px bg-surface-container hidden sm:block mx-1"></div><div class="flex items-center gap-space-sm pl-1 cursor-pointer group"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVuhKdcH1Gx1p6jzzF0KvFDgy0L0qLuaRTmGXWv0Nrgjevn4geJKiLNCw_cMcQmkYfZkYEeyCoKjZJB1Ina4DyrcnUsXeToP13HVgpD-vH93M0ywXFvXyyP307j1jSHMA613p2fh3Ms0e7Lv3qGxtmIHbxF3lcwdBuFOnuKMuzheaqhcDweFzyo11bOtQtt2l4EIYfqk9JNXhOAWc5JJSCxevgBj2ZwGdT1IMtOJ7t"/><div class="hidden lg:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Elena Vance</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">Enterprise Admin</span></div><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-on-surface transition-colors">expand_more</span></div></div></header><main class="relative pt-16 bg-background w-full px-gutter min-h-screen"><div class="flex flex-col w-full">
+<script>
+    (function syncSidebarAndBreadcrumb() {
+      const activeLink = document.querySelector('nav a[data-path="products-plans"]');
+      if (activeLink) {
+        document.querySelectorAll('nav a').forEach(el => {
+          el.className = "flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all";
+        });
+        activeLink.className = "flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg bg-primary-container text-on-primary-container font-semibold shadow-sm transition-all";
+      }
+      const breadcrumbs = document.querySelector('nav[aria-label="Breadcrumbs"]');
+      if (breadcrumbs) {
+        breadcrumbs.innerHTML = `
+          <span class="hover:text-on-surface cursor-pointer">Home</span>
+          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+          <span class="hover:text-on-surface cursor-pointer">Catalog &amp; Pricing</span>
+          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+          <span class="text-on-surface font-semibold">Products &amp; Plans</span>
+        `;
+      }
+    })();
+  </script>
+<div class="flex flex-col gap-space-lg pb-space-xl">
+<!-- Header Section -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pt-space-xs">
+<div class="flex flex-col gap-0.5">
+<div class="flex items-center gap-space-xs">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Products &amp; Plans</h1>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-label-sm text-label-sm font-semibold">v2.4 Production Catalog</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+          Manage product catalogs, pricing tiers, billing models, and entitlement quotas across your software portfolio.
+        </p>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm">
+<button class="flex items-center gap-1.5 px-space-sm py-2 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md font-medium shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">file_download</span>
+<span>Export Catalog</span>
+</button>
+<button class="flex items-center gap-1.5 px-space-sm py-2 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md font-medium shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">payments</span>
+<span>Currency: USD ($)</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">arrow_drop_down</span>
+</button>
+<div class="relative inline-flex">
+<button class="flex items-center gap-1.5 bg-primary hover:bg-primary-container text-on-primary pl-space-sm pr-2 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Create Product</span>
+<span class="h-4 w-px bg-white/20 mx-1"></span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Summary Metrics Strip -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+<!-- Metric 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Active Products</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-primary">
+<span class="material-symbols-outlined text-[18px]">category</span>
+</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-1">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface">8 Products</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1 truncate">
+<span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+          Across 3 product suites &amp; 14 SKUs
+        </p>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Published Plans</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-primary">
+<span class="material-symbols-outlined text-[18px]">view_timeline</span>
+</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-1">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface">24 Plans</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1 truncate">
+<span class="font-semibold text-tertiary">16 Public</span>
+<span class="text-on-surface-variant/40">·</span>
+<span>8 Custom/Negotiated</span>
+</p>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Avg Contract ARR</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-tertiary">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-1">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface">$18,450</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm font-semibold">
+            +12.4%
+          </span>
+</div>
+<div class="flex items-center justify-between mt-1">
+<span class="font-body-sm text-body-sm text-on-surface-variant">vs. previous quarter</span>
+<svg class="w-16 h-4 text-tertiary" fill="none" stroke="currentColor" viewbox="0 0 72 16">
+<path d="M1 13l14-6 12 3 16-8 14 5 14-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Most Adopted Tier</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-primary">
+<span class="material-symbols-outlined text-[18px]">stars</span>
+</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-1">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface">Growth Pro</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1 truncate">
+<span class="font-semibold text-primary">42% of base</span>
+<span class="text-on-surface-variant/40">·</span>
+<span>$799/mo or $7,990/yr</span>
+</p>
+</div>
+</div>
+<!-- Product Line Tabs & Filter Control Strip -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-sm bg-surface-container-lowest p-space-sm rounded-xl shadow-sm">
+<!-- Tabs -->
+<div class="flex items-center gap-1 overflow-x-auto">
+<button class="px-space-sm py-1.5 rounded-lg bg-primary-container text-on-primary-container font-label-md text-label-md font-semibold whitespace-nowrap" type="button">
+            All Products (8)
+          </button>
+<button class="px-space-sm py-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap transition-colors" type="button">
+            Core Billing (4)
+          </button>
+<button class="px-space-sm py-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap transition-colors" type="button">
+            Developer APIs (2)
+          </button>
+<button class="px-space-sm py-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap transition-colors" type="button">
+            Enterprise Security (2)
+          </button>
+</div>
+<!-- View Controls & Quick Metrics -->
+<div class="flex items-center gap-space-xs self-end lg:self-auto">
+<div class="flex items-center bg-surface-container-low p-0.5 rounded-lg">
+<button aria-label="Grid view" class="p-1.5 rounded-md bg-surface-container-lowest text-primary shadow-xs" type="button">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+</button>
+<button aria-label="List view" class="p-1.5 rounded-md text-on-surface-variant hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-[18px]">format_list_bulleted</span>
+</button>
+</div>
+<button class="flex items-center gap-1 px-space-sm py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">tune</span>
+<span>Filters</span>
+</button>
+</div>
+</div>
+<!-- Search & Attribute Filter Bar -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-xs bg-surface-container-lowest p-space-sm rounded-xl shadow-sm">
+<div class="md:col-span-5 relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-[18px] text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:bg-surface-container focus:ring-1 focus:ring-primary transition-all" placeholder="Search plans, product ID, feature tags (e.g., Avalara, SLA)..." type="text"/>
+</div>
+<div class="md:col-span-3">
+<select aria-label="Filter by billing model" class="w-full bg-surface-container-low text-on-surface font-body-sm text-body-sm rounded-lg px-3 py-2 focus:outline-none focus:bg-surface-container focus:ring-1 focus:ring-primary">
+<option>Billing Model: All Models</option>
+<option>Flat Recurring (Monthly/Annual)</option>
+<option>Per-Seat / User Tiered</option>
+<option>Metered Usage-Based</option>
+</select>
+</div>
+<div class="md:col-span-2">
+<select aria-label="Filter by status" class="w-full bg-surface-container-low text-on-surface font-body-sm text-body-sm rounded-lg px-3 py-2 focus:outline-none focus:bg-surface-container focus:ring-1 focus:ring-primary">
+<option>Status: Active (21)</option>
+<option>Draft (2)</option>
+<option>Archived / Sunset (1)</option>
+</select>
+</div>
+<div class="md:col-span-2 flex items-center justify-end gap-1">
+<button class="w-full py-2 px-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md text-center transition-colors" type="button">
+            Reset Filters
+          </button>
+</div>
+</div>
+</div>
+<!-- Featured Product Catalog Card (Brightloop Core Billing - Flagship Suite) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Product Suite Banner Header -->
+<div class="p-space-lg bg-gradient-to-r from-surface-container-low to-surface-container-lowest flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md min-w-0">
+<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-xs shrink-0">
+<span class="material-symbols-outlined text-[28px]">account_tree</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex flex-wrap items-center gap-space-xs">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">Brightloop Core Billing</h2>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                Active · Production
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-caption-mono text-caption-mono text-on-surface-variant font-mono">
+                PROD-BL-CORE
+              </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-3xl">
+              Comprehensive recurring billing engine with automated tax calculation, revenue ledgers, and intelligent dunning workflows.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button class="px-space-sm py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors" type="button">
+            Edit Suite Metadata
+          </button>
+<button class="px-space-sm py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-xs transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>New Plan Tier</span>
+</button>
+</div>
+</div>
+<!-- 4 Tier Plan Cards Grid -->
+<div class="p-space-lg grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-space-md">
+<!-- Tier 1: Starter Plan -->
+<div class="bg-surface-container-low/70 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low transition-all">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider bg-surface-container-high text-on-surface-variant font-semibold">
+                Entry Level
+              </span>
+<button aria-label="Starter plan options" class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Starter Plan</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">
+                Essential recurring billing for emerging teams and early product-market fit.
+              </p>
+</div>
+<div class="py-space-xs">
+<div class="flex items-baseline gap-1">
+<span class="font-display text-display font-bold text-on-surface tracking-tight">$199</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">/ month</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Billed annually at $1,990 / yr</span>
+</div>
+<!-- Entitlements -->
+<div class="space-y-2 pt-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Plan Quotas &amp; Inclusions</span>
+<ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Up to <strong>5 operator seats</strong> ($20/extra)</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span><strong>50,000</strong> monthly API calls</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Standard email support (48h SLA)</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>1 active Webhook endpoint</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="pt-space-md mt-space-md bg-surface-container-low/90 rounded-lg p-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Active Subscriptions</span>
+<span class="font-semibold text-on-surface">482 accounts</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 22%"></div>
+</div>
+<div class="flex items-center gap-space-xs pt-space-xs">
+<button class="flex-1 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors text-center shadow-2xs" type="button">
+                Edit Plan
+              </button>
+<button class="px-2 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant transition-colors" title="Duplicate Plan" type="button">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tier 2: Growth Pro (MOST POPULAR) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md flex flex-col justify-between relative overflow-hidden ring-2 ring-primary/20">
+<div class="absolute top-0 right-0 bg-primary-container text-on-primary-container px-3 py-1 rounded-bl-xl font-label-sm text-label-sm font-semibold tracking-wider flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+            MOST POPULAR
+          </div>
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider bg-primary/10 text-primary font-semibold">
+                High Velocity
+              </span>
+<button aria-label="Growth Pro options" class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container mr-28" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Growth Pro</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">
+                High-scale billing infrastructure for rapidly accelerating SaaS companies.
+              </p>
+</div>
+<div class="py-space-xs">
+<div class="flex items-baseline gap-1">
+<span class="font-display text-display font-bold text-primary tracking-tight">$799</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">/ month</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-semibold">Billed annually at $7,990 / yr (Save 16%)</span>
+</div>
+<!-- Entitlements -->
+<div class="space-y-2 pt-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Plan Quotas &amp; Inclusions</span>
+<ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span>Up to <strong>25 base operator seats</strong></span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span><strong>500,000</strong> monthly API calls</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span>Automated sales tax (Avalara module)</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span>Smart Dunning &amp; Revenue Ledgers</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span>10 active Webhook endpoints</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="pt-space-md mt-space-md bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface">
+<span class="font-semibold text-primary">1,620 active subscriptions</span>
+<span class="font-bold">42% base</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-1.5 rounded-full" style="width: 78%"></div>
+</div>
+<div class="flex items-center gap-space-xs pt-space-xs">
+<button class="flex-1 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold transition-colors text-center shadow-xs" type="button">
+                Edit Plan
+              </button>
+<button class="px-2 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors" title="Manage Entitlements" type="button">
+                Entitlements
+              </button>
+</div>
+</div>
+</div>
+<!-- Tier 3: Scale Enterprise -->
+<div class="bg-surface-container-low/70 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low transition-all">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider bg-surface-container-high text-on-surface-variant font-semibold">
+                Strategic Scale
+              </span>
+<button aria-label="Scale Enterprise options" class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Scale Enterprise</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">
+                Maximum compliance, throughput, and dedicated engineering consultation.
+              </p>
+</div>
+<div class="py-space-xs">
+<div class="flex items-baseline gap-1">
+<span class="font-display text-display font-bold text-on-surface tracking-tight">$1,800</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">/ month</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Billed annually at $18,000 / yr</span>
+</div>
+<!-- Entitlements -->
+<div class="space-y-2 pt-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Plan Quotas &amp; Inclusions</span>
+<ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span><strong>Unlimited</strong> operator seats</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Dedicated <strong>99.99% uptime SLA</strong></span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>24/7 Phone &amp; Slack Connect</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Multi-entity &amp; Localized tax rules</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Custom dunning cadence &amp; webhooks</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="pt-space-md mt-space-md bg-surface-container-low/90 rounded-lg p-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Active Subscriptions</span>
+<span class="font-semibold text-on-surface">980 accounts</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 48%"></div>
+</div>
+<div class="flex items-center gap-space-xs pt-space-xs">
+<button class="flex-1 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors text-center shadow-2xs" type="button">
+                Edit Plan
+              </button>
+<button class="px-2 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant transition-colors" title="Manage Entitlements" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tier 4: Enterprise Custom -->
+<div class="bg-surface-container-low/70 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low transition-all">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider bg-surface-container-high text-on-surface-variant font-semibold">
+                Bespoke Contract
+              </span>
+<button aria-label="Enterprise Custom options" class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Enterprise Custom</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">
+                Tailored multi-year contracts, dedicated database shards, and custom residency.
+              </p>
+</div>
+<div class="py-space-xs">
+<div class="flex items-baseline gap-1">
+<span class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">Custom Pricing</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Annual or Multi-Year commitments</span>
+</div>
+<!-- Entitlements -->
+<div class="space-y-2 pt-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Plan Quotas &amp; Inclusions</span>
+<ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Tailored usage &amp; throughput caps</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Dedicated Solutions Architect</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Custom payment terms (Net 60 / Net 90)</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span>Bespoke MSA, DPA &amp; BAA agreements</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="pt-space-md mt-space-md bg-surface-container-low/90 rounded-lg p-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Active Contracts</span>
+<span class="font-semibold text-on-surface">328 enterprise MSAs</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-tertiary h-1.5 rounded-full" style="width: 32%"></div>
+</div>
+<div class="flex items-center gap-space-xs pt-space-xs">
+<button class="flex-1 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors text-center shadow-2xs" type="button">
+                Configure Template
+              </button>
+<button class="px-2 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant transition-colors" title="View Active Quotes" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Add-ons & Usage-based Rates Section -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Catalog Add-ons &amp; Metered Overages</h3>
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm font-semibold text-on-surface-variant">4 Active Rates</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Billable line items, capacity overage tariffs, and feature switches attached across all standard plans.
+          </p>
+</div>
+<button class="flex items-center gap-1.5 px-space-sm py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors shrink-0" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">add</span>
+<span>Add Catalog Item</span>
+</button>
+</div>
+<!-- Addons Table -->
+<div class="overflow-x-auto rounded-lg">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead class="bg-surface-container-low font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+<tr>
+<th class="py-3 px-space-md" scope="col">Item Name &amp; SKU</th>
+<th class="py-3 px-space-md" scope="col">Type / Billing Frequency</th>
+<th class="py-3 px-space-md" scope="col">Rate (USD)</th>
+<th class="py-3 px-space-md" scope="col">Linked Plans</th>
+<th class="py-3 px-space-md" scope="col">Status</th>
+<th class="py-3 px-space-md text-right" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">group_add</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface">Additional Operator Seat</span>
+<span class="font-caption-mono text-caption-mono text-on-surface-variant">ADDON-SEAT-01</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                Per-Seat / Monthly Recurring
+              </td>
+<td class="py-3.5 px-space-md font-semibold text-on-surface">
+                $20.00 <span class="font-normal text-on-surface-variant">/ seat / mo</span>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                Starter, Growth Pro
+              </td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+                </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button aria-label="Edit Additional Operator Seat" class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">lan</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface">Dedicated Webhook IP Address</span>
+<span class="font-caption-mono text-caption-mono text-on-surface-variant">ADDON-IP-DEDICATED</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                Flat Recurring / Monthly
+              </td>
+<td class="py-3.5 px-space-md font-semibold text-on-surface">
+                $100.00 <span class="font-normal text-on-surface-variant">/ mo</span>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                All Plans
+              </td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+                </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button aria-label="Edit Dedicated Webhook IP Address" class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">data_thresholding</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface">Extra API Requests Tier</span>
+<span class="font-caption-mono text-caption-mono text-on-surface-variant">MTR-API-OVRG</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                Metered / Usage-Based
+              </td>
+<td class="py-3.5 px-space-md font-semibold text-on-surface">
+                $0.002 <span class="font-normal text-on-surface-variant">/ call beyond plan cap</span>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                Starter, Growth Pro
+              </td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+                </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button aria-label="Edit Extra API Requests Tier" class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3.5 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">domain_verification</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface">Custom Domain &amp; White-labeling</span>
+<span class="font-caption-mono text-caption-mono text-on-surface-variant">ADDON-WHLBL-ENT</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                Flat Recurring / Monthly
+              </td>
+<td class="py-3.5 px-space-md font-semibold text-on-surface">
+                $250.00 <span class="font-normal text-on-surface-variant">/ mo</span>
+</td>
+<td class="py-3.5 px-space-md text-on-surface-variant">
+                Growth Pro, Scale
+              </td>
+<td class="py-3.5 px-space-md">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+                </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button aria-label="Edit Custom Domain &amp; White-labeling" class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div></main></div>
+</body></html>
