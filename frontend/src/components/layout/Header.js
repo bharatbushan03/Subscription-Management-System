@@ -62,10 +62,10 @@ export function Header({
           </button>
         </div>
 
-        <button class="hidden sm:flex items-center gap-1.5 bg-primary hover:bg-primary-container text-on-primary px-3 py-2 rounded-lg font-label-md text-label-md font-semibold transition-colors shadow-sm" type="button">
+        <a href="#subscriptions" class="hidden sm:flex items-center gap-1.5 bg-primary hover:bg-primary-container text-on-primary px-3 py-2 rounded-lg font-label-md text-label-md font-semibold transition-colors shadow-sm">
           <span class="material-symbols-outlined text-[18px]">add</span>
           <span>New Subscription</span>
-        </button>
+        </a>
 
         <div class="h-6 w-px bg-surface-container hidden sm:block mx-0.5"></div>
 
@@ -80,8 +80,11 @@ export function Header({
             <span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">${user.name || 'Elena Vance'}</span>
             <span class="font-label-sm text-[11px] text-on-surface-variant leading-tight">${user.role || 'Enterprise Admin'}</span>
           </div>
-          <span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-on-surface transition-colors">expand_more</span>
         </a>
+
+        <button data-action="logout" title="Sign Out" class="text-on-surface-variant hover:text-error hover:bg-error-container/20 p-2 rounded-lg transition-colors ml-1" type="button">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+        </button>
       </div>
     </header>
   `;

@@ -372,3 +372,18 @@ export async function ChurnRetentionPage() {
     </div>
   `;
 }
+
+// Interactive handlers for ChurnRetentionPage
+document.addEventListener('page:rendered', (e) => {
+  if (e.detail.route !== 'churn-retention') return;
+
+  // Interventions in table
+  document.querySelectorAll('#page-content table button').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const actionName = btn.innerText.trim();
+      const accountName = btn.closest('tr')?.querySelector('span.font-semibold')?.innerText || 'Account';
+      const { toast } = await import('../components/common/Toast.js');
+      toast.info(`Playbook "${actionName}" dispatched for ${accountName}. Assigned CSM alerted.`);
+    });
+  });
+});
